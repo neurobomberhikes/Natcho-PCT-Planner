@@ -34,7 +34,9 @@ nav button{flex:1;padding:12px 0 13px;background:none;border:none;border-bottom:
 nav button.on{color:#F2F4EE;border-bottom-color:var(--amber)}
 main{padding:12px 12px 4px}
 .hint{font-size:13px;color:var(--muted);margin:2px 4px 12px;line-height:1.45}
-.card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:8px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.card input,.card textarea,textarea{-webkit-user-select:auto;user-select:auto;-webkit-touch-callout:default}
+#dayOv{-webkit-user-select:none;user-select:none}
 .card.today{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber)}
 .card.done{opacity:.55}
 .rowtop{display:flex;gap:10px;align-items:center}
@@ -162,6 +164,10 @@ svg text{font-family:var(--mono)}
         <div class="seg2"><button id="gpsMan">Manual</button><button id="gpsAuto">Auto</button></div>
       </div>
       <div class="sub" style="margin:-4px 0 8px 102px">Uses single position fixes only (seconds of radio — minimal battery). Manual: fix only when you tap Locate. Auto: one fix when opening Log/Plan, at most every 5 min. Off: GPS never used.</div>
+      <div class="setrow"><label>Day profile</label>
+        <div class="seg2"><button id="dpOn">On</button><button id="dpOff">Off</button></div>
+      </div>
+      <div class="sub" style="margin:-4px 0 8px 102px">Press &amp; hold the day/date on any Log or Plan card to peek that day's elevation profile; release to close.</div>
       <div class="setrow"><label>Colours</label>
         <div class="seg2"><button id="colOn">On</button><button id="colOff">Off</button></div>
       </div>
@@ -244,7 +250,7 @@ svg text{font-family:var(--mono)}
 
 <script>
 // ============ Neurobomber's Natcho v2 — © 2026 Neurobomber. All rights reserved. ============
-const APP_VERSION="2.2.0";
+const APP_VERSION="2.2.1";
 const CANONICAL_PIN=""; // optional: set your permanent URL here when rebranding to pin share/QR/version-check
 function canonical(){
   if(CANONICAL_PIN) return CANONICAL_PIN;
@@ -450,6 +456,7 @@ if(!Array.isArray(st.routeChanges)) st.routeChanges=[];
 if(!st.questSel) st.questSel={};
 if(!Array.isArray(st.customQuests)) st.customQuests=[];
 if(st.settings.backupDays===undefined) st.settings.backupDays="1";
+if(st.settings.dayPeek===undefined) st.settings.dayPeek="on";
 if(!st.actuals) st.actuals={}; if(!st.planned) st.planned={};
 for(const k in st.actuals){ if(typeof st.actuals[k]==="string") st.actuals[k]={v:st.actuals[k],m:"mi"}; }
 }
@@ -979,6 +986,7 @@ function renderSetup(m){
   T("gpsOn",st.gps==="on");T("gpsOff",st.gps!=="on");
   T("gpsMan",st.gpsMode!=="auto");T("gpsAuto",st.gpsMode==="auto");
   T("logMi",st.logMode!=="pct");T("logPct",st.logMode==="pct");
+  T("dpOn",st.dayPeek!=="off");T("dpOff",st.dayPeek==="off");
   T("colOn",st.colors!==false);T("colOff",st.colors===false);
   T("legsOn2",st.legsOn===true);T("legsOff2",st.legsOn!==true);
   T("qOn",st.questsOn===true);T("qOff",st.questsOn!==true);
@@ -1150,11 +1158,16 @@ function showDayOverlay(d,view){
 function hideDayOverlay(){const ov=document.getElementById("dayOv");if(ov)ov.style.display="none";}
 let lpT=null,lpShown=false,lpXY=null;
 function lpBegin(target,x,y){
+  if(state.settings.dayPeek==="off")return;
   const dc=target.closest&&target.closest(".daycol"); if(!dc)return;
   const card=dc.closest("[data-day]"); if(!card)return;
   lpXY=[x,y];
   clearTimeout(lpT);
-  lpT=setTimeout(()=>{lpShown=true;showDayOverlay(parseInt(card.dataset.day,10),card.dataset.dview);},350);
+  lpT=setTimeout(()=>{
+    lpShown=true;
+    try{const sel=window.getSelection&&window.getSelection(); if(sel&&sel.removeAllRanges) sel.removeAllRanges();}catch(e){}
+    showDayOverlay(parseInt(card.dataset.day,10),card.dataset.dview);
+  },350);
 }
 function lpEnd(){clearTimeout(lpT);lpT=null;if(lpShown){hideDayOverlay();lpShown=false;}}
 document.body.addEventListener("touchstart",e=>{if(e.touches.length===1)lpBegin(e.target,e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
@@ -1312,6 +1325,8 @@ on("logFixBtn",()=>{
 });
 on("logMi",()=>{state.settings.logMode="mi";persist();renderAll();});
 on("logPct",()=>{state.settings.logMode="pct";persist();renderAll();});
+on("dpOn",()=>{state.settings.dayPeek="on";persist();renderAll();});
+on("dpOff",()=>{state.settings.dayPeek="off";persist();renderAll();});
 on("colOn",()=>{state.settings.colors=true;persist();renderAll();});
 on("colOff",()=>{state.settings.colors=false;persist();renderAll();});
 on("legsOn2",()=>{state.settings.legsOn=true;persist();renderAll();const e=document.getElementById("rcEditor");if(e&&e.scrollIntoView)setTimeout(()=>e.scrollIntoView({behavior:"smooth",block:"start"}),60);});
