@@ -104,6 +104,10 @@ svg text{font-family:var(--mono)}
     <b>Seeing this message?</b> This preview doesn't run the app's code — this happens when you tap the file in the iPhone Files app (Quick Look). To use the tracker: open it from its web address in Safari, or open the file in the free <b>Documents by Readdle</b> app.
   </div>
   <section id="tab-log">
+    <div id="bkBanner" class="card" style="display:none;border-color:var(--amber);background:#FBF3DC;align-items:center;gap:10px">
+      <div style="flex:1;min-width:0"><div class="daynum" style="color:#8a651f">🔒 BACKUP REMINDER</div><div class="sub" id="bkAgo"></div></div>
+      <button class="reset" id="bkNow" style="margin:0;padding:9px 12px;width:auto;flex-shrink:0">Back up now</button>
+    </div>
     <div id="gpsBar" class="card" style="display:none;border-color:var(--trail);align-items:center;gap:10px" hidden>
       <div style="flex:1;min-width:0">
         <div class="daynum">GPS</div>
@@ -181,6 +185,20 @@ svg text{font-family:var(--mono)}
       <button class="reset" id="cqAdd">Add custom quest</button>
     </div>
     <div class="card">
+      <div class="daynum">BACKUP &amp; RESTORE</div>
+      <div class="sub" id="bkStatus" style="margin-top:4px"></div>
+      <div class="setrow" style="margin-top:8px;margin-bottom:6px"><label>Remind every</label><input inputmode="numeric" id="bkDays" data-bkdays="1" style="max-width:80px;flex:0"><div class="sub" style="margin:0">days (0 = off)</div></div>
+      <div style="display:flex;gap:8px;margin:8px 0">
+        <button class="reset" id="bkShare" style="margin:0;flex:1">Share backup</button>
+        <button class="reset" id="bkCopy" style="margin:0;flex:1">Copy backup</button>
+      </div>
+      <textarea id="bkText" rows="3" style="width:100%;font-family:var(--mono);font-size:11px;border:1.5px solid #c3cbbe;border-radius:5px;background:#F6F7F3;padding:8px;box-sizing:border-box" placeholder="Backup text appears here when you share/copy — or paste a backup here and tap Import."></textarea>
+      <button class="reset" id="bkImport" style="margin:8px 0 4px">Import from text</button>
+      <div class="sub" style="margin-top:8px"><b>On-device snapshots</b> — taken automatically on first open each day:</div>
+      <div id="snapList"></div>
+      <div class="note">Share/copy puts your data somewhere off this phone (Notes, a message to yourself). Snapshots protect against accidental erases but live on this phone — they can't survive deleting the app icon.</div>
+    </div>
+    <div class="card">
       <div class="daynum">VERSION &amp; SHARING</div>
       <div class="sub" id="verLine" style="margin-top:4px"></div>
       <div class="sub" id="verStatus" style="margin-top:4px"></div>
@@ -217,7 +235,7 @@ svg text{font-family:var(--mono)}
 
 <script>
 // ============ Neurobomber's Natcho v2 — © 2026 Neurobomber. All rights reserved. ============
-const APP_VERSION="2.0.6";
+const APP_VERSION="2.1.0";
 const CANONICAL_PIN=""; // optional: set your permanent URL here when rebranding to pin share/QR/version-check
 function canonical(){
   if(CANONICAL_PIN) return CANONICAL_PIN;
@@ -409,19 +427,24 @@ function saveState(s){
   catch(e){flashSave("preview mode — entries won’t persist");}
 }
 let saveT=null, state=loadState();
-if(!state.settings) state.settings=defaultState().settings;
-if(state.settings.end===2658.9) state.settings.end=2650.1;
-if(state.settings.start===2658.9) state.settings.start=2650.1;
-if(state.settings.colors===undefined) state.settings.colors=true;
-if(!state.settings.logMode) state.settings.logMode="mi";
-if(!state.settings.gps) state.settings.gps="off";
-if(!state.settings.gpsMode) state.settings.gpsMode="manual";
-if(state.settings.legsOn===undefined) state.settings.legsOn=false;
-if(state.settings.questsOn===undefined) state.settings.questsOn=false;
-if(!Array.isArray(state.routeChanges)) state.routeChanges=[];
-if(!state.questSel) state.questSel={};
-if(!Array.isArray(state.customQuests)) state.customQuests=[];
-for(const k in state.actuals){ if(typeof state.actuals[k]==="string") state.actuals[k]={v:state.actuals[k],m:"mi"}; }
+function normalize(st){
+if(!st.settings) st.settings=defaultState().settings;
+if(st.settings.end===2658.9) st.settings.end=2650.1;
+if(st.settings.start===2658.9) st.settings.start=2650.1;
+if(st.settings.colors===undefined) st.settings.colors=true;
+if(!st.settings.logMode) st.settings.logMode="mi";
+if(!st.settings.gps) st.settings.gps="off";
+if(!st.settings.gpsMode) st.settings.gpsMode="manual";
+if(st.settings.legsOn===undefined) st.settings.legsOn=false;
+if(st.settings.questsOn===undefined) st.settings.questsOn=false;
+if(!Array.isArray(st.routeChanges)) st.routeChanges=[];
+if(!st.questSel) st.questSel={};
+if(!Array.isArray(st.customQuests)) st.customQuests=[];
+if(st.settings.backupDays===undefined) st.settings.backupDays="1";
+if(!st.actuals) st.actuals={}; if(!st.planned) st.planned={};
+for(const k in st.actuals){ if(typeof st.actuals[k]==="string") st.actuals[k]={v:st.actuals[k],m:"mi"}; }
+}
+normalize(state);
 function persist(){clearTimeout(saveT); flashSave("saving…"); saveT=setTimeout(()=>saveState(state),400);}
 function flashSave(msg){const el=document.getElementById("saveNote"); el.textContent=msg; if(msg==="saved") setTimeout(()=>{if(el.textContent==="saved")el.textContent="";},1500);}
 
@@ -513,6 +536,65 @@ function maybeAutoLocate(){
   if(st.gps!=="on"||st.gpsMode!=="auto")return;
   const age=state.lastFix?Date.now()-state.lastFix.t:1e15;
   if(age>5*60*1000) doLocate(true);
+}
+
+// ---------------- backup & snapshots ----------------
+const SNAPKEY="pct_full_snaps";
+function readSnaps(){try{const r=localStorage.getItem(SNAPKEY);return r?JSON.parse(r):[];}catch(e){return [];}}
+function writeSnaps(a){try{localStorage.setItem(SNAPKEY,JSON.stringify(a));}catch(e){}}
+function snapshotNow(label){
+  const d={...state}; delete d.qr;
+  const a=readSnaps();
+  a.unshift({t:Date.now(),label:label||"auto",n:Object.keys(d.actuals||{}).length,data:d});
+  writeSnaps(a.slice(0,7));
+}
+function maybeAutoSnapshot(){
+  if(!Object.keys(state.actuals||{}).length) return;
+  const a=readSnaps();
+  if(!a.length||new Date(a[0].t).toDateString()!==new Date().toDateString()) snapshotNow("auto");
+}
+function backupPayload(){
+  const d={...state}; delete d.qr;
+  return "NATCHO1:"+JSON.stringify({v:APP_VERSION,t:Date.now(),data:d});
+}
+function parseBackup(txt){
+  try{
+    const m=(txt||"").trim();
+    const j=JSON.parse(m.startsWith("NATCHO1:")?m.slice(8):m);
+    const d=j&&j.data?j.data:j;
+    if(!d||!d.settings||!d.actuals) return null;
+    return d;
+  }catch(e){return null;}
+}
+function recordExport(){state.lastExport=Date.now();persist();renderAll();}
+function backupDue(){
+  const days=num(state.settings.backupDays);
+  if(days===null||days<=0) return false;
+  if(!Object.keys(state.actuals||{}).length) return false;
+  return Date.now()-(state.lastExport||0)>=days*86400000;
+}
+async function shareBackup(){
+  const txt=backupPayload();
+  const ta=document.getElementById("bkText"); if(ta) ta.value=txt;
+  try{ if(navigator.share){ await navigator.share({title:"Natcho backup "+new Date().toLocaleDateString(),text:txt}); recordExport(); return; } }
+  catch(e){ if(e&&e.name==="AbortError") return; }
+  copyBackup();
+}
+async function copyBackup(){
+  const txt=backupPayload();
+  const ta=document.getElementById("bkText"); if(ta) ta.value=txt;
+  try{ await navigator.clipboard.writeText(txt); flashSave("backup copied"); recordExport(); }
+  catch(e){ flashSave("select & copy the text box"); }
+}
+function importBackup(){
+  const ta=document.getElementById("bkText");
+  const d=parseBackup(ta?ta.value:"");
+  if(!d){ flashSave("not a valid Natcho backup"); return; }
+  const n=Object.keys(d.actuals||{}).length;
+  if(!confirm("Replace ALL current data with this backup ("+n+" logged day"+(n===1?"":"s")+")? A pre-import snapshot will be kept.")) return;
+  snapshotNow("pre-import");
+  state=d; normalize(state);
+  persist(); renderAll(); flashSave("backup restored");
 }
 
 // ---------------- interval utilities ----------------
@@ -933,6 +1015,11 @@ function renderSetup(m){
     }
   }
   // version + share
+  const bd=document.getElementById("bkDays"); if(bd&&document.activeElement!==bd) bd.value=state.settings.backupDays??"1";
+  const bs=document.getElementById("bkStatus");
+  if(bs) bs.textContent=state.lastExport?("Last off-device backup: "+new Date(state.lastExport).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})):"No off-device backup yet.";
+  const sl=document.getElementById("snapList");
+  if(sl) sl.innerHTML=readSnaps().map((sn,i)=>'<div class="setrow" style="margin-bottom:6px"><div class="sub" style="margin:0;flex:1">'+new Date(sn.t).toLocaleDateString("en-US",{month:"short",day:"numeric"})+' · '+sn.n+' day'+(sn.n===1?"":"s")+' logged · '+esc(sn.label)+'</div><button class="ilbl" data-snaprestore="'+i+'" style="width:auto">restore</button></div>').join("")||'<div class="sub">None yet — taken automatically once you log days.</div>';
   const vEl=document.getElementById("verLine"); if(vEl) vEl.textContent="Natcho v"+APP_VERSION+" · © 2026 Neurobomber · Free for personal, noncommercial use (PolyForm NC 1.0.0 — see LICENSE in the repo). Commercial rights reserved.";
   const uEl=document.getElementById("shareUrl"); if(uEl) uEl.textContent=canonical()||"(available when hosted)";
   ensureQR();
@@ -941,6 +1028,13 @@ function renderAll(focusInfo){
   const m=compute();
   const pi=document.getElementById("paceInput"); if(pi&&document.activeElement!==pi) pi.value=state.pace??"";
   renderHeader(m); renderLog(m); renderStones(m); renderPlan(m); renderSetup(m);
+  const bb=document.getElementById("bkBanner");
+  if(bb){
+    const due=backupDue();
+    bb.style.display=due?"flex":"none";
+    if(due){const ago=state.lastExport?Math.floor((Date.now()-state.lastExport)/86400000):null;
+      document.getElementById("bkAgo").textContent=ago===null?"Your log has never been backed up off this phone.":ago+" day"+(ago===1?"":"s")+" since your last off-device backup.";}
+  }
   const gb=document.getElementById("gpsBar");
   if(gb){
     const on=state.settings.gps==="on";
@@ -1019,6 +1113,14 @@ document.body.addEventListener("click",e=>{
   }
   const rd=e.target.closest&&e.target.closest("[data-rcdel]");
   if(rd){ state.routeChanges.splice(parseInt(rd.dataset.rcdel,10),1); persist(); renderAll(); return; }
+  const sr=e.target.closest&&e.target.closest("[data-snaprestore]");
+  if(sr){
+    const sn=readSnaps()[parseInt(sr.dataset.snaprestore,10)];
+    if(sn&&confirm("Restore snapshot from "+new Date(sn.t).toLocaleDateString()+" ("+sn.n+" logged days)? Current data will be replaced (a pre-restore snapshot is kept).")){
+      snapshotNow("pre-restore"); state=sn.data; normalize(state); persist(); renderAll(); flashSave("snapshot restored");
+    }
+    return;
+  }
   const cd=e.target.closest&&e.target.closest("[data-cqdel]");
   if(cd){ state.customQuests.splice(parseInt(cd.dataset.cqdel,10),1); persist(); renderAll(); return; }
 });
@@ -1044,6 +1146,7 @@ document.body.addEventListener("input",e=>{
   const t=e.target; if(t.tagName!=="INPUT"||t.type==="date"||t.type==="checkbox")return;
   if(t.dataset.rc!==undefined||t.dataset.cq!==undefined)return; // handled on change
   const clean=t.value.replace(/[^0-9.]/g,""); if(clean!==t.value)t.value=clean;
+  if(t.dataset.bkdays!==undefined){ state.settings.backupDays=clean; persist(); return; }
   const kind=t.dataset.actual?"actual":t.dataset.plan?"plan":t.dataset.pace?"pace":null; if(!kind)return;
   const d=t.dataset.actual||t.dataset.plan||"";
   if(kind==="actual") state.actuals[d]={v:clean,m:t.dataset.mode||state.settings.logMode||"mi"}; else if(kind==="plan") state.planned[d]=clean; else state.pace=clean;
@@ -1118,6 +1221,10 @@ on("resetBtn",()=>{state.planned={};persist();renderAll();});
 on("wipeBtn",()=>{
   if(confirm("Erase all logged days and per-day overrides? Your route settings stay.")){state.actuals={};state.planned={};persist();renderAll();}
 });
+on("bkShare",shareBackup);
+on("bkCopy",copyBackup);
+on("bkImport",importBackup);
+on("bkNow",shareBackup);
 on("verBtn",()=>checkVersion(false));
 on("shareBtn",shareApp);
 document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{
@@ -1129,6 +1236,7 @@ document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()
 
 const jw=document.getElementById("jsWarn"); if(jw) jw.remove();
 if('serviceWorker' in navigator && location.protocol==='https:'){try{navigator.serviceWorker.register('./sw.js');}catch(e){}}
+maybeAutoSnapshot();
 renderAll();
 maybeAutoLocate();
 checkVersion(true);
