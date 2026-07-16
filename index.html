@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#16241B">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-title" content="Natcho">
+<title>Neurobomber’s Natcho · PCT Tracker</title>
+<style>
+:root{
+  --fir:#16241B; --fir2:#3d5245; --granite:#EBEDE6; --ink:#22301F;
+  --trail:#33684A; --amber:#E8A33D; --blaze:#B34A22;
+  --muted:#5a6657; --line:#d7dcd2; --card:#ffffff;
+  --disp:-apple-system-headline,'Avenir Next Condensed','Arial Narrow',-apple-system,sans-serif;
+  --body:-apple-system,'Helvetica Neue',Segoe UI,Roboto,sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--granite);color:var(--ink);font-family:var(--body);max-width:520px;margin-inline:auto}
+header{background:var(--fir);color:#F2F4EE;padding:calc(env(safe-area-inset-top,0px) + 14px) 16px 12px}
+.eyebrow{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:1.2px;color:#9fb0a2;text-transform:uppercase}
+.headmain{display:flex;justify-content:space-between;align-items:flex-end;margin-top:12px;gap:12px}
+.milelabel{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;color:#9fb0a2}
+.milebig{font-family:var(--disp);font-weight:700;font-size:54px;line-height:.95;letter-spacing:.5px;font-stretch:condensed}
+.chip{display:inline-block;font-family:var(--disp);font-weight:600;font-size:14px;letter-spacing:.5px;padding:3px 10px;border-radius:3px;text-transform:uppercase;font-stretch:condensed}
+.headstat{font-size:12px;color:#c6d0c4;margin-top:5px;text-align:right}
+.nextline{margin-top:6px;font-family:var(--mono);font-size:11px;letter-spacing:.5px;color:var(--amber)}
+nav{display:flex;background:var(--fir);position:sticky;top:0;z-index:5}
+nav button{flex:1;padding:12px 0 13px;background:none;border:none;border-bottom:3px solid transparent;color:#9fb0a2;font-family:var(--disp);font-weight:600;font-size:15px;letter-spacing:.6px;text-transform:uppercase;cursor:pointer;font-stretch:condensed}
+nav button.on{color:#F2F4EE;border-bottom-color:var(--amber)}
+main{padding:12px 12px 4px}
+.hint{font-size:13px;color:var(--muted);margin:2px 4px 12px;line-height:1.45}
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:8px}
+.card.today{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber)}
+.card.done{opacity:.55}
+.rowtop{display:flex;gap:10px;align-items:center}
+.daycol{width:78px;flex-shrink:0}
+.daynum{font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.5px;color:var(--trail);font-stretch:condensed}
+.daydate{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:1px}
+.loc{font-weight:700;font-size:14.5px;line-height:1.25}
+.sub{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+.mid{flex:1;min-width:0}
+.mono{font-family:var(--mono)}
+.pos{color:var(--trail);font-weight:600}.neg{color:var(--blaze);font-weight:600}
+.note{margin-top:8px;padding-top:7px;border-top:1px dashed var(--line);font-size:12px;color:#6b7566;line-height:1.4}
+.iw{width:78px;flex-shrink:0;text-align:center}
+.iw input{width:100%;padding:10px 6px;font-family:var(--mono);font-size:16px;font-weight:600;text-align:center;border:1.5px solid #c3cbbe;border-radius:5px;background:#F6F7F3;color:var(--ink)}
+.iw input.filled{border-color:var(--trail);background:#EEF4EE}
+.iw input:focus{outline:2px solid var(--amber);outline-offset:1px}
+.iw input::placeholder{color:#a9b3a6}
+.ilbl{font-family:var(--mono);font-size:9px;letter-spacing:.8px;color:#8a948a;margin-top:3px;text-transform:uppercase}
+button.ilbl{background:none;border:none;cursor:pointer;padding:0;width:100%;color:var(--trail);text-decoration:underline dotted}
+.ellip{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reset{display:block;width:100%;margin-bottom:12px;padding:11px;background:#fff;border:1.5px solid var(--trail);border-radius:6px;color:var(--trail);font-family:var(--disp);font-weight:600;font-size:15px;letter-spacing:.6px;text-transform:uppercase;cursor:pointer;font-stretch:condensed}
+.reset.danger{border-color:var(--blaze);color:var(--blaze)}
+.setrow{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.setrow label{width:92px;flex-shrink:0;font-family:var(--disp);font-weight:600;font-size:14px;letter-spacing:.4px;color:var(--trail);text-transform:uppercase;font-stretch:condensed}
+.setrow select,.setrow input{flex:1;min-width:0;padding:10px;font-size:15px;border:1.5px solid #c3cbbe;border-radius:5px;background:#F6F7F3;color:var(--ink);font-family:var(--body)}
+.seg2{display:flex;gap:0;border:1.5px solid var(--trail);border-radius:6px;overflow:hidden;flex:1}
+.seg2 button{flex:1;padding:10px;border:none;background:#F6F7F3;color:var(--trail);font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.6px;cursor:pointer;font-stretch:condensed}
+.seg2 button.on{background:var(--trail);color:#fff}
+footer{padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 24px);font-size:11.5px;color:#7d877c;line-height:1.45}
+svg text{font-family:var(--mono)}
+.mk{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.5px;padding:2px 6px;border-radius:3px;margin-left:6px;vertical-align:2px;background:#FAF3D1;border:1px solid #d9c26a;color:#7a651f;white-space:nowrap}
+.mk.gold{background:#F6E2A8;border-color:#C99A2E;color:#6b4e0a}
+.card.bg-res{background:#F1E7D6}
+.card.bg-cent{background:#FAF3D1}
+.card.bg-warn{background:#FBE9E4}
+.card.bg-gold{background:#F6E2A8;border-color:#C99A2E}
+.card.bg-travel{background:#E7EDF4;border-color:#8ba3bd}
+.card.bg-quest{background:#EBE4F2;border-color:#a68cc4}
+.mk.quest{background:#EBE4F2;border-color:#a68cc4;color:#5b4479}
+</style>
+</head>
+<body>
+<header>
+  <div style="font-family:var(--disp);font-weight:700;font-size:21px;letter-spacing:1.2px;color:var(--amber);text-transform:uppercase;font-stretch:condensed;margin-bottom:6px">Neurobomber’s Natcho</div>
+  <div class="eyebrow"><span id="tripLine">PCT</span><span id="saveNote" style="opacity:.55"></span></div>
+  <div class="headmain">
+    <div><div class="milelabel">CURRENT PCT MILE</div><div class="milebig" id="curMile">0.0</div></div>
+    <div style="text-align:right">
+      <div class="chip" id="varChip">no days logged yet</div>
+      <div class="headstat" id="stat1"></div>
+      <div class="headstat" id="stat2"></div>
+    </div>
+  </div>
+  <svg id="ribbon" viewBox="0 0 340 64" style="width:100%;height:64px;display:block;margin-top:12px" aria-label="Elevation profile"></svg>
+  <div class="nextline" id="nextLine"></div>
+</header>
+
+<nav>
+  <button data-tab="log" class="on">Log</button>
+  <button data-tab="stones">Milestones</button>
+  <button data-tab="plan">Plan</button>
+  <button data-tab="setup">Setup</button>
+</nav>
+
+<main>
+  <div id="jsWarn" style="background:#FBEEDC;border:1.5px solid #E8A33D;border-radius:6px;padding:12px 14px;margin:12px 12px 0;font-size:13.5px;line-height:1.5;color:#5a4a2a">
+    <b>Seeing this message?</b> This preview doesn't run the app's code — this happens when you tap the file in the iPhone Files app (Quick Look). To use the tracker: open it from its web address in Safari, or open the file in the free <b>Documents by Readdle</b> app.
+  </div>
+  <section id="tab-log">
+    <div id="gpsBar" class="card" style="display:none;border-color:var(--trail);align-items:center;gap:10px" hidden>
+      <div style="flex:1;min-width:0">
+        <div class="daynum">GPS</div>
+        <div class="sub" id="gpsStatus">No fix yet</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <button class="reset" id="locateBtn" style="margin:0;padding:8px 12px;width:auto">GPS Locate</button>
+        <button class="reset" id="logFixBtn" style="margin:0;padding:8px 12px;width:auto;display:none">→ Log today</button>
+      </div>
+    </div>
+    <p class="hint">Enter the miles you actually walked each day. Positions, dates, and milestones re-map to reality as you go.</p>
+    <div id="logList"></div>
+  </section>
+  <section id="tab-stones" hidden>
+    <p class="hint">Resupply points and key milestones on your route (🛒 in the Log marks actual resupply only). Plan date uses your predicted pace; ETA blends your actuals with predictions.</p>
+    <div id="stoneList"></div>
+  </section>
+  <section id="tab-plan" hidden>
+    <p class="hint">Set your predicted pace — it applies to every unlogged day and can be changed anytime. Fine-tune individual days below (per-day entries override the pace).</p>
+    <div class="card" style="display:flex;align-items:center;gap:12px;border-color:var(--trail)">
+      <div style="flex:1"><div class="daynum">PREDICTED PACE</div><div class="sub">Miles per day for all unlogged days</div></div>
+      <div class="iw"><input inputmode="decimal" placeholder="15" id="paceInput" data-pace="1"><div class="ilbl">mi / day</div></div>
+    </div>
+    <button class="reset" id="resetBtn">Reset per-day overrides</button>
+    <div id="planList"></div>
+  </section>
+  <section id="tab-setup" hidden>
+    <p class="hint">Note: entering Canada via the trail is not currently permitted — NOBO hikes end at the Northern Terminus, then backtrack (Hart's Pass is the usual ~30 mi exit). Choose where and when your hike starts and ends. Mile markers are planning approximations (FarOut/Halfmile revisions shift them a little) — verify in your nav app.</p>
+    <div class="card">
+      <div class="setrow"><label>Direction</label>
+        <div class="seg2"><button id="dirNOBO" data-dir="NOBO">NOBO ↑</button><button id="dirSOBO" data-dir="SOBO">SOBO ↓</button></div>
+      </div>
+      <div class="setrow"><label>Start</label><select id="startSel"></select></div>
+      <div class="setrow"><label>End</label><select id="endSel"></select></div>
+      <div class="setrow"><label>Start date</label><input type="date" id="dateInput"></div>
+      <div class="setrow"><label>Flip-flop</label>
+        <div class="seg2"><button id="legsOn2">On</button><button id="legsOff2">Off</button></div>
+      </div>
+      <div class="sub" style="margin:-4px 0 8px 102px">Route changes for jumps, skips, flip-flops and yo-yos — position-based: "at mile X, jump to Y, continue NOBO/SOBO". Editor appears below when on.</div>
+      <div class="setrow"><label>Side quests</label>
+        <div class="seg2"><button id="qOn">On</button><button id="qOff">Off</button></div>
+      </div>
+      <div class="sub" style="margin:-4px 0 8px 102px">Bonus-mile detours (Mt. Whitney, custom peaks/hot springs) — extra days and gain are injected where each quest anchors.</div>
+      <div class="setrow"><label>Log entry</label>
+        <div class="seg2"><button id="logMi">Miles / day</button><button id="logPct">PCT mile</button></div>
+      </div>
+      <div class="sub" style="margin:-4px 0 8px 102px">Default for new log entries — enter miles walked, or the PCT mile you reached (miles walked is then calculated). Tap the label under any day's box to switch that day.</div>
+      <div class="setrow"><label>GPS</label>
+        <div class="seg2"><button id="gpsOn">On</button><button id="gpsOff">Off</button></div>
+      </div>
+      <div class="setrow"><label>GPS refresh</label>
+        <div class="seg2"><button id="gpsMan">Manual</button><button id="gpsAuto">Auto</button></div>
+      </div>
+      <div class="sub" style="margin:-4px 0 8px 102px">Uses single position fixes only (seconds of radio — minimal battery). Manual: fix only when you tap Locate. Auto: one fix when opening Log/Plan, at most every 5 min. Off: GPS never used.</div>
+      <div class="setrow"><label>Colours</label>
+        <div class="seg2"><button id="colOn">On</button><button id="colOff">Off</button></div>
+      </div>
+      <div class="sub" style="margin:-4px 0 8px 102px">Shades important days: <span class="mk" style="margin-left:0;background:#FBE9E4;border-color:#d99;color:#8a3b25">warnings/dry</span> <span class="mk" style="background:#F1E7D6;border-color:#c9b48e;color:#6b5636">resupply</span> <span class="mk">100-mile marks</span> <span class="mk gold">halfway &amp; terminus</span></div>
+      <div class="sub" id="setupSummary" style="margin-top:4px"></div>
+    </div>
+    <div id="rcEditor" style="display:none">
+      <div class="sub" style="margin:2px 4px 8px"><b>Route changes</b> — trailhead to trailhead, applied in trip order; direction persists until the next change. Travel day inserts a zero-mile day at the jump. Presets below build a typical pattern you can then adjust.</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="reset" id="pJump" style="margin:0;flex:1;padding:9px 4px">Jump / skip</button>
+        <button class="reset" id="pFlip" style="margin:0;flex:1;padding:9px 4px">Flip-flop</button>
+        <button class="reset" id="pYoyo" style="margin:0;flex:1;padding:9px 4px">Yo-yo</button>
+      </div>
+      <div id="rcList"></div>
+      <button class="reset" id="rcAdd">Add route change</button>
+    </div>
+    <div id="qEditor" style="display:none">
+      <div class="sub" style="margin:2px 4px 8px"><b>Side quests</b> — tick to add the miles, days and climb at each anchor.</div>
+      <div id="qBuiltins" class="card"></div>
+      <div id="qCustom"></div>
+      <button class="reset" id="cqAdd">Add custom quest</button>
+    </div>
+    <div class="card">
+      <div class="daynum">VERSION &amp; SHARING</div>
+      <div class="sub" id="verLine" style="margin-top:4px"></div>
+      <div class="sub" id="verStatus" style="margin-top:4px"></div>
+      <button class="reset" id="verBtn" style="margin:8px 0">Check for update</button>
+      <div class="sub">Share the Natcho — the official source is:</div>
+      <div class="mono" id="shareUrl" style="font-size:13px;margin:4px 0;word-break:break-all"></div>
+      <button class="reset" id="shareBtn" style="margin:8px 0">Share link</button>
+      <div style="text-align:center"><img id="qrImg" alt="QR code link to the app" style="display:none;width:200px;max-width:70%;margin:4px auto;border:6px solid #fff;border-radius:6px;background:#fff"></div>
+      <div class="note">Copies of this file frozen outside the official link don't receive trail-data or bug updates.</div>
+    </div>
+    <button class="reset danger" id="wipeBtn">Erase all logged days &amp; overrides</button>
+    <div class="card" style="border-color:var(--blaze)">
+      <div class="daynum" style="color:var(--blaze)">DATA &amp; ACCURACY — READ FIRST</div>
+      <div class="sub" style="margin-top:6px"><b>This app is a beta, for experimental use only. All data is unverified and should not be relied on.</b> It is a planning toy, not a navigation, safety, or decision-making tool. Always carry and use a dedicated navigation app (FarOut, Gaia, CalTopo) and paper backup.</div>
+      <div class="note"><b>Sources.</b> Trail centerline: Pacific Crest Trail Association (PCTA) published route data. Elevation: USGS / NASA SRTM public-domain terrain models, sampled via GPS Visualizer. Waypoints and mile markers: compiled by hand and approximate.</div>
+      <div class="note"><b>Known caveats.</b> Mile markers can differ from FarOut/Halfmile by a mile or more (trail reroutes; calibrated only at ~36 trailheads). Elevation is sampled every 0.1 mi and smoothed — summits read slightly low and daily climb totals are estimates. Water sources, resupply status, trail closures, snow, and fire conditions are NOT tracked here and change constantly. Trail access rules change (e.g., entry into Canada is currently not permitted). Verify everything against current official sources before acting on it.</div>
+    </div>
+    <div class="card" id="emgCard" style="border-color:var(--blaze)">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div class="daynum" style="color:var(--blaze)">🆘 LAST GPS FIX</div>
+          <div id="emgCoords" style="font-family:var(--mono);font-weight:600;font-size:28px;line-height:1.25;margin-top:6px;white-space:pre-line">GPS is off</div>
+          <div class="sub" id="emgTime" style="margin-top:4px"></div>
+          <div class="sub" id="gpsStatus2" style="margin-top:2px"></div>
+        </div>
+        <button class="reset" id="locateBtn2" style="margin:0;padding:10px 12px;width:auto;flex-shrink:0">GPS Locate</button>
+      </div>
+      <div class="note">Decimal degrees (lat / lon) — readable to search &amp; rescue. Coordinates stay on this phone.</div>
+    </div>
+  </section>
+</main>
+
+<footer>Mileages are planning estimates — verify routing and water in FarOut / Gaia / CalTopo. Entries save on this device automatically and the app works offline after its first online load. © 2026 Neurobomber. All rights reserved. · Personal, noncommercial use only.</footer>
+
+<script>
+// ============ Neurobomber's Natcho v2 — © 2026 Neurobomber. All rights reserved. ============
+const APP_VERSION="2.0.6";
+const CANONICAL_PIN=""; // optional: set your permanent URL here when rebranding to pin share/QR/version-check
+function canonical(){
+  if(CANONICAL_PIN) return CANONICAL_PIN;
+  if(typeof location!=="undefined"&&location.protocol==="https:") return location.origin+location.pathname.replace(/index\.html$/,"");
+  return "";
+}
+const WPTS=[
+[0,"Campo — Southern Terminus","TR"],[20,"Lake Morena","R"],[41.5,"Mt. Laguna","R"],
+[77.3,"Scissors Crossing (Julian)","TR"],[109.5,"Warner Springs","TR"],
+[151.9,"Paradise Valley Café / Hwy 74 (Idyllwild)","TR"],[179.4,"Saddle Junction (Idyllwild)","R"],
+[209.5,"I-10 / San Gorgonio Pass","T"],[266.1,"Big Bear / Hwy 18","TR"],
+[298.5,"Deep Creek Hot Springs",""],[342,"Cajon Pass / I-15","TR"],
+[369.4,"Inspiration Point / Wrightwood","TR"],[378.8,"Mt. Baden-Powell","P"],
+[436.1,"Acton KOA","R"],[454.5,"Agua Dulce","TR"],[517.6,"Hikertown / Hwy 138","R"],
+[566.5,"Tehachapi / Hwy 58","TR"],[651.3,"Walker Pass (Lake Isabella)","TR"],
+[702.2,"Kennedy Meadows South","TR"],[745.3,"Cottonwood Pass (Horseshoe Mdw)","TP"],
+[766.3,"Crabtree Meadow (Whitney jct)",""],[779.5,"Forester Pass — PCT high point","P"],
+[788.9,"Kearsarge Pass jct (Independence)","TR"],[794.4,"Glen Pass","P"],[807.1,"Pinchot Pass","P"],[816.9,"Mather Pass","P"],[838.6,"Muir Pass","P"],
+[857.7,"Muir Trail Ranch jct","R"],[864.7,"Selden Pass","P"],[874.5,"VVR junction (Lake Edison)","R"],[888.6,"Silver Pass","P"],
+[906.6,"Reds Meadow / Mammoth Lakes","TR"],[929.5,"Donohue Pass","P"],[942.5,"Tuolumne Meadows","TR"],
+[1016.9,"Sonora Pass (Kennedy Mdws North)","TR"],[1048.3,"Ebbetts Pass / Hwy 4","T"],
+[1076.4,"Carson Pass / Hwy 88","T"],[1092.3,"Echo Lake / South Lake Tahoe","TR"],
+[1125.8,"Barker Pass","T"],[1153.4,"Donner Pass / I-80 (Truckee)","TR"],
+[1195.4,"Sierra City","TR"],[1284.3,"Belden","TR"],[1325,"PCT Midpoint","M"],
+[1331.1,"Chester / Hwy 36","TR"],[1373.4,"Old Station","R"],
+[1419,"Burney Falls State Park","TR"],[1501.2,"Castella / Castle Crags (I-5)","TR"],
+[1599.7,"Etna Summit (Etna)","TR"],[1656.9,"Seiad Valley","TR"],
+[1718.7,"Callahan's / I-5 (Ashland, OR)","TR"],[1773.4,"Fish Lake jct / Hwy 140","R"],
+[1821.9,"Mazama Village (Crater Lake)","TR"],[1906.6,"Shelter Cove Resort","R"],
+[1952.6,"Elk Lake Resort (Bend)","R"],[1983.8,"McKenzie Pass / Hwy 242","T"],
+[2000.9,"Santiam Pass / Hwy 20 (Sisters)","TR"],[2046.9,"Olallie Lake","R"],
+[2094.3,"Timberline Lodge (Mt. Hood)","TR"],[2147.1,"Cascade Locks / Bridge of the Gods","TR"],
+[2229.5,"Trout Lake / Hwy 141","R"],[2294.9,"White Pass (Packwood)","TR"],
+[2325,"Chinook Pass / Hwy 410","T"],[2394.1,"Snoqualmie Pass / I-90","TR"],
+[2464.1,"Stevens Pass (Leavenworth)","TR"],[2571.9,"Stehekin (High Bridge)","TR"],
+[2588.9,"Rainy Pass / Hwy 20","T"],[2620.6,"Hart's Pass / Slate Peak Rd","T"],
+[2650.1,"Northern Terminus — US/Canada border (no services; Canada entry closed)","TM"]];
+const TRAILHEADS=WPTS.filter(w=>w[2].includes("T"));
+const SEGS=[
+[0,"Campo / border chaparral","Hot, exposed start; don't count on caches — carry from Campo"],
+[15,"Lake Morena / Cottonwood Creek",""],[32,"Fred Canyon / Long Canyon climb",""],
+[41.5,"Mt. Laguna crest","Exposed rim above Anza-Borrego; wind and sun"],
+[59,"Pioneer Mail / desert rim","Long dry stretch to Scissors Crossing — tank up"],
+[77.3,"San Felipe Hills","Notoriously hot and dry ~24 mi; Third Gate cache not guaranteed"],
+[101,"Barrel Spring / grasslands","Eagle Rock"],
+[109.5,"Warner Springs / Agua Caliente Ck","Water and resupply at community center"],
+[127,"Combs Peak / Anza high country","Trail-angel water tanks unreliable — verify"],
+[151.9,"Hwy 74 / Desert Divide","Paradise Valley Café; Idyllwild access"],
+[168,"Desert Divide ridgeline","Long climb; water sparse"],
+[179,"San Jacinto / Fuller Ridge","Snow hazard early season; Idyllwild via Devil's Slide"],
+[190,"Fuller Ridge → desert floor","7,000-ft descent; hot and dry"],
+[209.5,"I-10 / San Gorgonio Pass","Extreme heat; water at the I-10 faucet"],
+[218,"Whitewater / Mission Creek","Mission Creek washouts — expect routefinding"],
+[240,"Heart Bar / Onyx Summit forests",""],
+[266.1,"Big Bear corridor","Resupply via Hwy 18 hitch"],
+[285,"Holcomb & Deep Creek","Deep Creek hot springs mi 298.5; watch for poodle-dog bush"],
+[310,"Silverwood / Mojave River","Hot and exposed"],
+[328,"Cleghorn / Cajon approach",""],
+[342,"Cajon Pass / I-15","McDonald's 0.4 mi off; then ~22 dry miles climbing to Wrightwood — tank up"],
+[365,"Blue Ridge / Wrightwood","Resupply via Acorn Trail"],
+[374,"Mt. Baden-Powell / Angeles Crest","9,400-ft summit; frog-closure detour near mi 390"],
+[400,"Mill Creek / Mt. Gleason","Station Fire burn; poodle-dog bush"],
+[430,"Soledad Canyon / Vasquez Rocks","Hot canyon; Acton KOA"],
+[454.5,"Agua Dulce / Sierra Pelona","Town resupply"],
+[478,"San Francisquito / Lake Hughes",""],
+[500,"Sawmill / Liebre Mountain","Last shade before the Mojave floor"],
+[517.6,"Mojave floor / LA Aqueduct","Classic ~17-mi waterless aqueduct walk — many night-hike it; wind farms"],
+[550,"Tylerhorse / Tehachapi climb","Hot, exposed, windy"],
+[566.5,"Tehachapi / Hwy 58","Full resupply"],
+[585,"Cameron Ridge / piñon high desert","Longest dry carries on trail (30+ mi) — plan water hard"],
+[617,"Bird Spring Pass / Skinner Peak",""],[631,"Walker Pass approach",""],
+[651.3,"Walker Pass / Owens Peak","Lake Isabella via hitch; southern Sierra begins"],
+[680,"Chimney Creek / Kern Plateau","Water improves"],
+[702.2,"Kennedy Meadows / South Sierra","High Sierra gateway — bear canister required ahead; major resupply"],
+[720,"Olancha Peak country","Altitude begins; first 10,000+ ft"],
+[745,"Cottonwood Pass / Chicken Spring","Alpine from here; Horseshoe Meadow exit"],
+[760,"Rock Creek / Crabtree","Mt. Whitney side trip from Crabtree"],
+[774,"Bighorn Plateau / Forester approach",""],
+[779.5,"Forester Pass","13,120 ft — PCT high point; snow chutes early season"],
+[785,"Vidette Meadow / Kearsarge","Kearsarge Pass exit → Independence/Bishop resupply"],
+[794,"Glen Pass / Rae Lakes","Woods Creek crossing"],
+[808,"Pinchot Pass basin",""],
+[820,"Mather Pass / Palisades","Golden Staircase"],
+[838,"Muir Pass / Evolution Basin","Evolution Creek ford — serious in early season"],
+[857,"Muir Trail Ranch / San Joaquin","MTR bucket resupply; Selden Pass ahead"],
+[874,"Selden / Bear Ridge / VVR","VVR via ferry or Bear Ridge trail"],
+[890,"Silver Pass / Tully Hole",""],
+[906.6,"Reds Meadow / Devils Postpile","Mammoth Lakes via shuttle"],
+[920,"Thousand Island / Donohue Pass","Banner & Ritter views; enter Yosemite"],
+[942.5,"Tuolumne Meadows","Seasonal store/PO; Lyell Canyon"],
+[960,"Yosemite north country","Relentless fords and climbs; July mosquitoes"],
+[997,"Dorothy Lake / Sonora gateway","Canister zone ends near Sonora Pass"],
+[1016.9,"Sonora Pass","Kennedy Meadows North resupply; lingering snowfields"],
+[1030,"Carson-Iceberg volcanic ridges",""],
+[1048.3,"Ebbetts Pass / Mokelumne",""],
+[1076.4,"Carson Pass / Meiss country",""],
+[1092.3,"Echo Lake / Desolation Wilderness","South Lake Tahoe resupply; Aloha lakes basin"],
+[1108,"Dicks Pass / Velma Lakes",""],
+[1125.8,"Barker Pass / Tahoe rim",""],
+[1140,"Granite Chief / Tinker Knob",""],
+[1153.4,"Donner Pass / Truckee","Resupply via I-80"],
+[1170,"Castle Peak / Jackson Meadows",""],
+[1195.4,"Sierra City / Sierra Buttes","Big climb out; buy or send box"],
+[1220,"Lakes Basin / Plumas ridges",""],
+[1250,"Quincy–La Porte / Middle Fork","Descent to Middle Fork Feather"],
+[1270,"Bucks Lake Wilderness",""],
+[1284.3,"Belden / Feather River canyon","Brutal hot 4,500-ft climb out; poison oak low down"],
+[1310,"Humbug / Lassen approach",""],
+[1325,"PCT Midpoint","Halfway monument"],
+[1331.1,"Chester / Hwy 36","Resupply via hitch"],
+[1345,"Lassen NP / Boiling Springs","Geothermal features; Drakesbad"],
+[1373.4,"Old Station / Hat Creek Rim","Rim ahead: ~30 mi hot and DRY — tank up, many night-hike it"],
+[1405,"Baum Lake / hatchery","Water at Crystal Lake hatchery"],
+[1419,"Burney Falls / Lake Britton","Park store; see the falls"],
+[1440,"McCloud forests / Grizzly Peak",""],
+[1470,"Ash Camp / McCloud River",""],
+[1501.2,"Castella / Castle Crags","I-5: Dunsmuir & Mt. Shasta resupply; hot climb out; poison oak"],
+[1520,"Trinity Divide / Porcupine Lake",""],
+[1545,"Deadfall Lakes / Mt. Eddy",""],
+[1560,"Scott Mountains","Dry ridge stretches"],
+[1580,"Russian Wilderness",""],
+[1599.7,"Etna Summit / Marble Mountains","Etna is worth the hitch"],
+[1620,"Marble Valley / Paradise Lake",""],
+[1640,"Grider Creek descent","Poison oak near the bottom"],
+[1656.9,"Seiad Valley","Pancake challenge; brutally hot climb out"],
+[1680,"Devils Peaks / Siskiyou crest","Dry, hot ridges; Oregon border ~mi 1691"],
+[1718.7,"Callahan's / Ashland","I-5; full resupply in Ashland"],
+[1740,"Soda Mountain / Hyatt Lake","Oregon's gentler grades begin"],
+[1773.4,"Fish Lake / Brown Mtn lava","Sky Lakes mosquitoes are legendary in July"],
+[1800,"Sky Lakes / Devils Peak",""],
+[1821.9,"Crater Lake / Mazama","Take the Rim alternate; store at Mazama"],
+[1845,"Mt. Thielsen / dry plateau","Dry stretch north of Thielsen"],
+[1875,"Windigo / Diamond Peak","Mosquitoes"],
+[1906.6,"Shelter Cove / Willamette Pass","Resort resupply"],
+[1925,"Charlton Lake / lakes country",""],
+[1952.6,"Elk Lake / Three Sisters","Obsidian limited-entry zone; Bend via hitch"],
+[1983.8,"McKenzie Pass / Belknap lava","Ankle-eating lava fields"],
+[2000.9,"Santiam Pass / Three Fingered Jack","Fire scars; Sisters/Bend resupply"],
+[2020,"Mt. Jefferson / Jefferson Park","Fords; early-season snow lingers"],
+[2046.9,"Olallie Lake / green tunnel","Small store; long forest miles ahead"],
+[2075,"Timothy Lake / Hwy 26",""],
+[2094.3,"Timberline / Mt. Hood","The breakfast buffet is real; sandy trail"],
+[2110,"Ramona Falls / Sandy River","Glacial fords"],
+[2130,"Benson Plateau / Eagle Creek","Official PCT stays high; Eagle Creek alternate popular"],
+[2147.1,"Cascade Locks / Columbia River","Lowest point on the PCT; big resupply"],
+[2160,"Table Mountain climb","Huge climb out of the Gorge"],
+[2185,"Panther Creek / Big Lava Bed","Dry across the lava country"],
+[2229.5,"Trout Lake / Mt. Adams","Glacial fords on Adams; town via Hwy 141"],
+[2260,"Goat Rocks approach",""],
+[2278,"Goat Rocks / Knife's Edge","Most exposed stretch on the PCT — pick your weather"],
+[2294.9,"White Pass","Kracker Barrel store; Packwood via hitch"],
+[2310,"Rainier corridor / Chinook Pass","Ponds and mosquitoes"],
+[2340,"Norse Peak burn","2017 burn; blowdowns"],
+[2370,"Snoqualmie approach",""],
+[2394.1,"Snoqualmie Pass / I-90","Resupply; Alpine Lakes ahead"],
+[2415,"Alpine Lakes / Waptus","Rugged and rocky"],
+[2440,"Deception Lakes / Surprise Gap",""],
+[2464.1,"Stevens Pass","Resupply via Skykomish or Leavenworth"],
+[2485,"Glacier Peak south","Remote; big climbs, brush, blowdowns"],
+[2520,"Glacier Peak / Suiattle","Deepest wilderness on the trail"],
+[2550,"Miners Ridge / Agnes Creek",""],
+[2571.9,"Stehekin","The bakery is mandatory; shuttle from High Bridge"],
+[2588.9,"Rainy Pass / North Cascades","Cutthroat Pass; fall larches"],
+[2610,"Methow / Hart's Pass country",""],
+[2620.6,"Hart's Pass","Last road access — NOBO finishers backtrack to here"],
+[2635,"Rock Pass / Woody Pass","Final crest miles"],
+[2650.1,"Northern Terminus","Monument 78; Canada entry not permitted — turn around"]];
+function segFor(mile){let out=SEGS[0];for(const g of SEGS){if(g[0]<=mile+1e-9)out=g;else break;}return out;}
+const QUESTS=[
+ {id:"whitney",name:"Mt. Whitney summit",at:766.3,mi:15.5,gain:4100,alt:14505},
+ {id:"sanjac",name:"San Jacinto Peak",at:181,mi:3.5,gain:1800,alt:10834}];
+
+// ---------------- storage ----------------
+const KEY="pct_full_v1";
+let memStore=null;
+function loadState(){
+  try{const raw=localStorage.getItem(KEY); if(raw) return JSON.parse(raw);}catch(e){}
+  return memStore||defaultState();
+}
+function defaultState(){
+  const t=new Date();
+  const iso=t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");
+  return {actuals:{},planned:{},pace:"",routeChanges:[],questSel:{},customQuests:[],
+    settings:{dir:"NOBO",start:0,end:2650.1,date:iso,colors:true,logMode:"mi",gps:"off",gpsMode:"manual",legsOn:false,questsOn:false}};
+}
+function saveState(s){
+  memStore=s;
+  try{localStorage.setItem(KEY,JSON.stringify(s)); flashSave("saved");}
+  catch(e){flashSave("preview mode — entries won’t persist");}
+}
+let saveT=null, state=loadState();
+if(!state.settings) state.settings=defaultState().settings;
+if(state.settings.end===2658.9) state.settings.end=2650.1;
+if(state.settings.start===2658.9) state.settings.start=2650.1;
+if(state.settings.colors===undefined) state.settings.colors=true;
+if(!state.settings.logMode) state.settings.logMode="mi";
+if(!state.settings.gps) state.settings.gps="off";
+if(!state.settings.gpsMode) state.settings.gpsMode="manual";
+if(state.settings.legsOn===undefined) state.settings.legsOn=false;
+if(state.settings.questsOn===undefined) state.settings.questsOn=false;
+if(!Array.isArray(state.routeChanges)) state.routeChanges=[];
+if(!state.questSel) state.questSel={};
+if(!Array.isArray(state.customQuests)) state.customQuests=[];
+for(const k in state.actuals){ if(typeof state.actuals[k]==="string") state.actuals[k]={v:state.actuals[k],m:"mi"}; }
+function persist(){clearTimeout(saveT); flashSave("saving…"); saveT=setTimeout(()=>saveState(state),400);}
+function flashSave(msg){const el=document.getElementById("saveNote"); el.textContent=msg; if(msg==="saved") setTimeout(()=>{if(el.textContent==="saved")el.textContent="";},1500);}
+
+// ---------------- helpers ----------------
+const num=v=>{const n=parseFloat(v); return isNaN(n)?null:n;};
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const fmtMi=n=>(Math.round(n*10)/10).toLocaleString("en-US",{minimumFractionDigits:1,maximumFractionDigits:1});
+function startDate(){const p=(state.settings.date||"").split("-").map(Number); return p.length===3&&p[0]?new Date(p[0],p[1]-1,p[2]):new Date();}
+const dateForDay=d=>{const t=startDate(); t.setDate(t.getDate()+(d-1)); return t;};
+const fmtDate=d=>d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+const todayDayNum=()=>Math.floor((new Date().setHours(0,0,0,0)-startDate().setHours(0,0,0,0))/86400000)+1;
+function wname(mi){const w=WPTS.find(x=>Math.abs(x[0]-mi)<0.05); return w?w[1]:"mi "+fmtMi(mi);}
+
+// ---------------- elevation ----------------
+const ELE={step:0.5,e:[2917,2741,2667,2608,2553,2444,2482,2531,2461,2391,2537,2653,2810,2860,2957,3021,3266,3362,3333,3346,3389,3370,3374,3296,3134,3133,3089,2968,2891,2645,2366,2643,3001,3150,3329,3478,3429,3423,3255,3061,3062,3149,3156,3312,3408,3436,3247,3061,3094,3130,3164,3148,3208,3324,3557,3715,3763,3884,3894,4059,4193,4262,4254,4394,4588,4807,4933,4900,5143,5287,5298,5283,5225,5402,5597,5795,5927,6018,6000,5876,5832,6011,5978,5939,5945,5885,5903,5946,5912,5861,5710,5632,5429,5450,5393,5467,5566,5481,5500,5517,5490,5391,5241,5350,5484,5510,5398,5289,5314,5215,5185,5095,4941,4915,4965,4974,5036,4895,4795,4836,4772,4729,4712,4421,4017,4016,4096,4159,4228,4185,4244,4082,3951,3788,3656,3553,3388,3216,3142,3172,3338,3126,3007,3047,3053,2827,2608,2466,2380,2292,2259,2264,2374,2533,2767,2926,2960,3029,3071,3087,3099,3143,3253,3287,3278,3318,3288,3307,3355,3288,3293,3437,3591,3575,3596,3516,3417,3489,3574,3642,3765,3894,4029,4098,4240,4331,4292,4380,4383,4337,4229,4143,4134,4061,3944,3858,3762,3617,3454,3413,3486,3484,3313,3305,3329,3361,3514,3536,3450,3492,3481,3354,3233,3111,3047,2997,2931,2915,2942,2977,3001,3209,3326,3329,3263,3252,3351,3435,3637,3827,4044,4050,4160,4332,4448,4654,4842,4971,5038,5140,4982,5150,5021,4977,5112,5135,5197,5207,5101,5068,5239,5350,5481,5592,5595,5344,5039,4796,4702,4673,4660,4506,4269,4117,3998,3910,3809,3642,3613,3539,3620,3654,3528,3577,3425,3469,3719,3883,4058,4181,4115,4153,4300,4344,4396,4495,4644,4793,4893,4746,4589,4808,4847,4775,4849,4962,5056,4979,4974,4966,4901,4994,5061,5161,5121,5138,5321,5488,5663,5767,5952,6141,6285,6333,6575,6775,6777,6788,6854,6936,6984,7022,7072,6761,6431,6227,6023,6312,6719,7054,7041,7360,7320,7148,7008,6914,6908,7179,7264,7437,7624,7640,7937,8187,8326,8300,8217,8157,8497,8431,8252,8116,8407,8717,8969,8997,8681,8517,8315,8115,8185,8356,8571,8724,8916,8935,8620,8573,8665,8355,8455,8163,8025,7858,7748,7528,7347,7138,6901,6745,6548,6344,6118,5883,5622,5409,5224,4981,4736,4579,4392,4195,4040,3828,3613,3427,3288,3121,2933,2747,2574,2365,2209,2053,1860,1629,1373,1240,1209,1219,1245,1274,1340,1451,1582,1672,1823,1909,2058,2210,2395,2571,2817,3178,2905,2750,2851,2915,2756,2535,2307,2399,2503,2605,2700,2987,2899,3038,3260,3407,3552,3614,3659,3382,3064,3141,3265,3391,3521,3661,3812,3935,4053,4213,4402,4573,4735,4918,5074,5270,5483,5667,5892,6107,6394,6682,6703,6962,7121,7373,7587,7808,7972,8193,8130,8151,8048,8124,8314,8473,8500,8498,8383,8236,8093,8180,8365,8549,8707,8610,8394,8220,8125,8297,8446,8594,8571,8677,8604,8500,8274,8076,7904,7710,7574,7397,7222,7081,6949,7056,7155,7098,7031,7019,6926,6794,6914,6962,7045,6989,6932,6834,6890,6865,6867,6882,6921,6912,6902,7009,7209,7382,7587,7744,7781,7732,7651,7636,7464,7336,7329,7293,7431,7568,7746,7754,7663,7563,7565,7655,7748,7787,7850,7765,7664,7533,7398,7246,7095,6955,6833,6677,6526,6541,6437,6408,6460,6415,6346,6240,6083,5934,5748,5666,5564,5465,5396,5358,5236,5263,5181,5286,5257,5177,5108,4968,4846,4658,4642,4600,4468,4405,4301,4259,4238,4209,4232,4062,4037,4007,3985,3868,3766,3782,3835,3664,3568,3673,3506,3488,3362,3355,3359,3357,3354,3325,3082,3020,3113,3275,3511,3526,3470,3452,3386,3366,3362,3505,3567,3592,3542,3483,3461,3408,3383,3419,3304,3178,3206,3379,3378,3383,3425,3592,3605,3510,3447,3390,3470,3551,3645,3751,3938,4057,4102,3905,3787,3803,3774,3633,3569,3685,3771,3768,3751,3822,3930,3802,3706,3545,3338,3178,3102,2984,3051,3002,3080,3252,3455,3556,3503,3564,3613,3570,3664,3807,4000,4186,4374,4517,4679,4884,5115,5239,5266,5395,5505,5638,5765,5951,6105,6298,6497,6474,6660,6819,6993,7236,7422,7606,7785,8029,8226,8365,8330,8246,8120,8259,8389,8460,8349,8180,8058,7941,7760,7563,7391,7446,7365,7381,7324,7434,7421,7440,7221,6832,6687,7019,7371,7720,8061,8400,8758,9128,9094,8882,8850,8615,8627,8879,8805,8567,8359,8135,7728,7475,7463,7385,7191,6827,6791,7127,7510,7817,7491,7058,6737,6815,6572,6312,6169,6119,6168,6041,5795,5669,5960,6164,6368,6641,6703,6617,6674,6991,6884,6701,6537,6345,6214,6316,6250,6128,6003,5898,5936,5896,5896,5668,5616,5439,5278,5266,5405,5607,5686,5761,5903,6049,6296,6437,6625,6743,6683,6619,6400,6355,6337,6173,5926,5674,5504,5363,5251,5046,4953,5198,5378,5621,5699,5598,5530,5543,5560,5605,5584,5657,5575,5369,5235,5410,5478,5494,5707,5930,6093,6296,6242,5897,5694,5593,5365,5342,5422,5524,5363,4976,4746,4449,4236,4065,4107,4083,3931,3574,3331,3095,2791,2847,2931,2998,2844,2658,2643,2526,2275,2302,2578,2793,2918,2829,2789,2748,2965,3136,2910,2615,2556,2503,2395,2330,2450,2514,2572,2492,2510,2560,2580,2619,2700,2758,2934,2895,2877,2985,3272,3427,3698,3984,4189,4214,4474,4505,4311,4136,3963,3733,3476,3356,3508,3485,3412,3673,3945,4116,4264,4258,4062,3902,3747,3770,3796,3845,3879,3821,3765,3727,3618,3530,3575,3648,3668,3753,3508,3489,3776,4053,4240,4150,4007,3864,3871,3886,3841,3805,3739,3548,3298,3070,3169,3392,3655,3985,4208,4320,4513,4488,4497,4510,4491,4502,4599,4657,4703,4861,4935,5020,5083,5180,5248,5149,5098,4988,5034,4899,4819,4733,4761,5069,5333,5538,5638,5539,5512,5414,5417,5568,5559,5643,5719,5579,5250,4915,4646,4396,4171,4004,3829,3860,3721,3635,3635,3632,3592,3691,3548,3592,3467,3364,3277,3098,3046,2996,2972,2981,2968,2937,2901,2876,2898,2968,3042,3096,3096,3098,3098,3100,3100,3100,3102,3102,3104,3102,3102,3095,3010,2949,2901,2876,2871,2889,2930,3089,3115,3123,3122,3141,3236,3289,3395,3514,3661,3804,3983,4131,4332,4331,4689,4970,4891,4976,4991,5104,5098,4981,4779,4752,5013,5283,5525,5693,5943,6112,6222,6284,6215,6085,6028,6072,5907,5689,5503,5458,5365,5366,5227,5067,4926,4787,4505,4470,4305,4115,4135,4181,4265,4437,4501,4522,4527,4613,4694,4755,4603,4370,4131,3897,3827,3809,3799,3788,3774,3924,3983,4241,4546,4799,5113,5383,5544,5786,5992,6149,6013,6093,6108,6108,5977,5754,5450,5334,5548,5783,5957,6034,5879,5788,5684,5572,5533,5518,5533,5496,5337,5242,5219,5235,5325,5163,4914,4746,4794,4971,4964,4994,5041,5022,5112,5146,5230,5329,5374,5384,5148,5089,5270,5351,5540,5800,5727,5628,5750,6038,6092,6038,5828,5707,5669,5901,6151,6260,6286,6487,6466,6532,6548,6500,6646,6759,6705,6494,6393,6286,6249,6262,6301,6386,6423,6529,6681,6570,6421,6322,6207,6031,5842,5606,5366,5192,4988,4880,4730,4583,4611,4853,5054,5247,5334,5268,5381,5308,5316,5440,5496,5418,5442,5609,5617,5327,5360,5639,5940,5950,5905,5752,5931,5784,5606,5477,5396,5531,5702,5932,6201,6482,6687,6960,6911,6709,6571,6405,6303,6300,6456,6354,6387,6569,6519,6466,6510,6627,6688,6708,6742,6701,6699,6862,6932,6823,6881,6898,6789,6553,6362,6225,6092,5876,5654,5425,5184,5106,5214,5387,5616,5891,6129,6191,6281,6404,6591,6595,6528,6589,6822,6934,7196,7297,7189,7085,6955,6673,6374,6165,5878,5673,5483,5190,5102,5407,5568,5776,5721,5544,5381,5205,5091,5184,5440,5639,5857,6068,6373,6548,6727,6862,6967,6992,6884,6849,6827,6884,6653,6455,6217,5993,5841,5790,5767,5715,5563,5797,5866,6165,6419,6596,6861,7047,7304,7460,7592,7713,7903,7994,7819,7616,7354,7202,7046,6910,6778,6667,6528,6359,6180,5928,5908,5895,5811,5851,5914,5879,5885,5863,5750,5821,5863,5990,5951,5965,6039,5986,5979,6017,6029,6042,6078,6125,6150,6189,6228,6294,6410,6611,6767,6830,6921,7057,7161,7281,7417,7619,7911,8026,7931,7931,8016,8202,8355,8181,7968,7854,7880,7968,8061,8116,8227,8443,8703,8965,9200,9496,9771,10055,10138,10355,10472,10513,10268,10057,9834,9642,9413,9244,9080,8982,8969,9031,8985,8958,8961,9157,9402,9583,9737,9920,10176,10378,10528,10643,10542,10369,10445,10439,10429,10230,10120,10105,10055,9865,9753,9679,9685,9802,9974,10160,10348,10352,10464,10539,10741,10731,10751,10754,10905,10916,10978,11063,11105,11185,11330,11492,11380,11330,11344,11384,11294,11119,11000,10954,10980,10977,10899,10671,10442,10314,10046,9811,9646,9566,9932,10320,10445,10649,10879,10663,10582,10577,10563,10603,10334,10420,10756,10753,10654,10791,10922,10817,10625,10412,10659,10786,10935,11154,11387,11310,11118,11010,10957,11172,11374,11574,11822,11940,12172,12321,12510,12842,13051,12725,12343,12079,11794,11477,11280,10995,10784,10565,10434,10330,10174,10022,9876,9560,9529,9884,10283,10664,10749,10922,11118,11435,11884,11630,11266,10880,10562,10566,10570,10547,10496,10310,10215,9989,9722,9496,9322,9108,8923,8697,8516,8715,8947,9107,9305,9588,9787,10148,10453,10685,10936,11121,11364,11448,11662,12005,11827,11524,11264,11128,11030,10861,10636,10367,10047,10211,10385,10547,10674,10899,11058,11252,11449,11549,11739,11988,11886,11562,11235,11013,10848,10814,10728,10594,10441,10201,9854,9535,9166,8930,8890,8761,8638,8553,8455,8401,8292,8077,8152,8221,8270,8307,8440,8595,8686,8818,8892,9140,9235,9343,9558,9881,10235,10501,10738,10897,11127,11335,11623,11665,11898,11717,11546,11478,11463,11385,11312,11180,11003,10958,10890,10923,10869,10778,10539,10189,9916,9819,9754,9697,9646,9566,9483,9372,9228,9217,9146,8898,8550,8453,8393,8359,8250,8184,8136,8065,8017,7934,7944,7897,7917,8031,8224,8367,8659,8978,9373,9701,9888,10069,10004,10141,10173,10276,10530,10653,10783,10565,10480,10287,10097,9974,9783,9564,9499,9358,9277,9192,9109,9032,8945,8990,9167,9454,9767,9906,9930,9808,9564,9270,8895,8510,8187,7850,7904,7959,8227,8491,8740,8893,9270,9600,9711,10024,10261,10430,10560,10860,10617,10474,10226,9980,9697,9487,9185,9333,9496,9711,10104,10400,10374,10360,10484,10334,10011,9995,10268,10440,10399,10163,9947,10099,10171,10139,10099,10033,9892,9668,9414,9258,9102,9172,9185,9099,8938,8813,8641,8480,8303,8129,7948,7785,7562,7452,7660,7715,7680,7615,7628,7698,7753,7746,7805,7837,7918,7995,8212,8297,8340,8580,8765,8943,9159,9391,9620,9659,9638,9557,9648,9694,9502,9560,9652,9723,9840,9954,10125,10183,10201,10082,9779,9641,9826,10034,10162,10328,10440,10600,10928,10938,10654,10517,10181,9861,9679,9382,9025,8971,8953,8920,8909,8891,8886,8854,8840,8840,8835,8819,8810,8754,8728,8690,8667,8698,8672,8604,8581,8613,8629,8584,8555,8448,8426,8416,8353,8247,8061,7900,8105,8214,8472,8515,8649,8756,8664,8685,8717,8805,8890,8976,9043,8971,8619,8526,8646,8798,9158,9524,9390,9537,9465,9610,9269,8905,8576,8461,8440,8606,8926,9012,9214,9498,9788,10067,9779,9561,9294,9244,9237,9435,9332,8813,8525,8272,8014,7652,7689,8096,8406,8750,9009,9097,9077,8771,8710,8523,8361,8271,8101,8024,8012,8332,8639,8430,7892,7742,7983,8174,8530,8817,8615,8378,8397,8113,7926,7974,8071,8098,8149,8257,8322,8335,8365,8405,8546,8628,8656,8689,8803,8892,9040,9290,9409,9411,9521,9502,9329,9151,9030,9035,8945,8902,8881,8910,8729,8591,8563,8577,8565,8685,8901,9036,9115,9315,9663,9961,10204,10454,10577,10510,10519,10524,10584,10789,10760,10731,10639,10771,10795,10803,10498,10267,9945,9835,9625,9637,9823,10042,10285,10437,10505,10416,10175,9868,9566,9363,9109,8903,8705,8638,8438,8185,8126,8381,8694,8857,8761,8743,8623,8820,8802,8598,8798,9090,9262,9281,9151,9119,9177,9234,9220,9026,8989,8960,8714,8652,8370,8321,8395,8638,8716,8495,8493,8715,8948,9228,9277,9050,8846,8645,8460,8280,8359,8580,8768,8698,8781,8737,8778,8856,8795,8749,8814,8759,8680,8644,8587,8455,8377,8437,8179,8331,8583,8435,8459,8690,8452,8208,8220,8207,7932,7875,8045,8039,7990,7930,7908,7803,7808,7910,7924,7977,8147,8382,8489,8514,8687,8920,9099,8870,8694,8812,8881,8875,8889,8668,8470,8297,8446,8699,8876,8982,8781,8601,8562,8580,8547,8756,8647,8435,8384,8345,8326,8386,8682,8626,8771,8887,8967,8936,8663,8661,8631,8554,8710,8361,8095,7763,7526,7547,7578,7380,7249,7404,7577,7457,7476,7478,7585,7520,7472,7612,7796,8019,8278,8317,8295,8190,8142,8134,8118,7978,7912,7804,7793,7731,8033,8317,8413,8591,8859,9132,9328,9076,8734,8508,8336,8284,8289,8065,7917,7869,8037,8096,7863,7728,7636,7873,7900,8022,7960,7893,7802,7683,7604,7529,7534,7464,7367,7161,7126,7022,7080,7004,6941,7063,7203,7333,7378,7531,7695,7901,8147,8233,8065,7860,7768,7926,8113,8318,8363,8339,8326,8218,8266,8287,8368,8341,8366,8133,7856,7620,7435,7338,7133,7156,7291,7598,7882,8048,8268,8502,8324,8195,8195,8021,7823,7577,7724,7897,8046,8378,8723,8585,8369,8248,8209,8136,8009,7846,7784,7984,7939,7803,7619,7439,7211,7098,7047,7239,7089,7014,7177,7224,7192,7282,7293,7380,7530,7695,7896,7946,7833,8018,8257,8367,8175,7923,7700,7567,7667,7841,7988,7800,7627,7689,7870,8065,8054,8058,7896,7810,7911,7826,7645,7585,7792,8028,8166,7965,7783,7636,7779,8010,8049,7965,7808,7617,7427,7218,7256,7192,7077,6903,6703,6499,6377,6214,6201,6362,6361,6214,6170,6291,6418,6462,6326,6139,5954,5798,5541,5346,5231,5028,4950,4856,4772,4770,4816,4807,4606,4603,4821,5042,5270,5524,5736,5976,6054,6075,6309,6504,6644,6922,7074,7175,7303,7345,7196,7016,6836,6704,6545,6361,6185,6122,6351,6524,6725,6839,7020,7225,7393,7314,7098,7162,7314,7330,7464,7304,7332,7314,7242,7075,7185,7317,7215,6969,6811,6643,6581,6673,6932,7170,7360,7139,6949,6734,6448,6287,6097,5920,5847,5829,5928,6055,6245,6505,6421,6331,6635,6818,6980,6848,6690,6689,6868,6966,6780,6672,6511,6578,6571,6530,6233,5968,6015,5910,5762,5989,5906,5774,5681,5577,5528,5636,5476,5252,5107,5020,4924,5020,5005,4733,4498,4183,3933,3779,3515,3220,3009,3155,3416,3578,3479,3364,3245,3305,3545,3796,3973,4029,4271,4402,4694,4851,5171,5299,5539,5754,5842,5891,5887,5959,5902,5892,5786,5599,5451,5524,5579,5560,5533,5626,5637,5610,5498,5643,5875,6081,6272,6463,6622,6690,6758,6876,6985,6886,6877,6867,6884,6758,6747,6700,6533,6303,6220,6236,6196,6251,6303,6221,6107,5841,5571,5289,4911,4513,4071,3655,3302,2913,2593,2392,2245,2345,2444,2452,2445,2655,3036,3339,3571,3473,3515,3696,3699,4009,4203,4385,4482,4736,4970,5131,5337,5656,5948,6117,6354,6611,6893,7079,6905,6691,6602,6657,6539,6401,6399,6345,6424,6509,6661,6819,6991,7097,7116,7023,6853,6803,6750,6762,6701,6584,6610,6550,6347,6378,6420,6329,6290,6206,6281,6493,6616,6686,6627,6874,7112,7334,7532,7390,7381,7601,7566,7445,7249,7099,6897,6692,6556,6414,6222,6062,5894,5682,5486,5465,5305,5090,4886,4886,4966,5055,5056,5095,5073,5255,5372,5584,5779,5832,5805,5730,5802,5926,6041,5817,5650,5463,5223,5094,5087,5107,5135,5324,5564,5801,5911,5958,6018,6017,5961,6042,6215,6076,6240,6111,5945,5773,5649,5833,6186,6317,6263,6015,6107,6229,6298,6379,6419,6463,6654,6693,6640,6568,6547,6526,6457,6374,6333,6328,6372,6342,6330,6311,6311,6277,6321,6324,6297,6161,5968,5751,5548,5408,5226,5088,5005,4924,4856,4799,4710,4695,4673,4719,4625,4575,4539,4554,4527,4517,4528,4388,4384,4363,4360,4362,4520,4802,4905,4875,4779,4771,4679,4635,4626,4770,4834,4822,4808,4785,4786,4862,4908,4950,4983,5061,5102,5132,5091,5111,5088,4987,4880,4716,4733,4680,4676,4523,4308,4150,4150,4071,3985,3939,3922,4019,3953,3854,3695,3720,3749,3686,3592,3524,3462,3425,3386,3338,3281,3276,3136,3072,2995,2988,2999,3119,3224,3301,3330,3242,3120,3114,3135,3100,3106,3121,3098,3017,2999,3008,3010,3039,3075,3054,2972,2970,2943,2907,2893,2829,2873,3017,3193,3152,3055,2902,2979,3042,3231,3404,3605,3767,3947,4096,4290,4430,4541,4610,4666,4865,4967,5038,4914,4776,4925,5027,5168,5365,5427,5429,5435,5408,5231,5123,5122,5116,5173,5231,5229,5061,4990,5202,5386,5276,5297,5267,5147,5130,5200,5105,5125,5260,5284,5415,5615,5841,5894,6009,6073,6007,6066,6060,5809,5603,5652,5629,5616,5536,5399,5416,5453,5565,5493,5502,5353,5454,5423,5322,5530,5613,5372,5129,4892,4688,4501,4342,4222,4036,3854,3690,3558,3423,3292,3192,3061,3041,2959,2880,2684,2493,2394,2397,2365,2386,2272,2413,2618,2767,2966,3171,3370,3433,3462,3507,3547,3725,3866,3725,3520,3334,3109,3084,3116,3116,3125,2984,2804,2627,2830,3055,3345,3635,3838,3921,4088,4209,4369,4538,4623,4621,4680,4637,4566,4471,4427,4348,4206,4037,3960,3903,3767,3617,3413,3247,3038,2817,2617,2443,2323,2146,2122,2368,2439,2477,2647,2837,2856,2850,2901,2812,2600,2789,2668,2754,2949,3055,3145,3173,3156,3470,3446,3757,4060,4357,4673,4995,5269,5543,5717,5729,5848,5932,6032,6135,6236,6285,6382,6572,6565,6571,6541,6527,6668,6717,6750,6732,6671,6638,6627,6496,6611,6607,6746,6735,6771,6761,6917,6866,6934,7043,7134,7304,7389,7481,7581,7567,7496,7358,7297,7217,7225,7224,7174,7100,7012,6941,6879,6844,6876,6876,6858,6841,6828,6812,6781,6746,6663,6744,6804,6715,6625,6728,6875,6999,7056,6941,6883,6774,6671,6467,6362,6250,6188,6078,6039,6054,6087,6132,6144,6152,6165,6219,6180,6205,6189,6058,5921,5705,5443,5504,5789,5981,6236,6355,6477,6594,6662,6518,6345,6238,6300,6554,6795,6934,7050,7070,7215,7375,7387,7245,7110,7179,7304,7146,7151,7136,7151,7029,6867,6807,6764,6780,6654,6461,6249,5947,5805,5968,6219,6502,6749,6926,6816,6847,6976,7162,6954,6821,7027,7311,7108,6927,6841,6549,6479,6410,6390,6626,6924,6867,6865,6763,6840,6877,6720,6579,6533,6628,6846,6893,7031,7270,7211,7026,6844,6584,6250,5990,6134,6313,6419,6370,6463,6723,6760,6599,6429,6448,6339,6247,6211,6168,6268,6397,6486,6477,6517,6382,6272,6293,6449,6480,6418,6494,6409,6206,6318,6408,6494,6778,6702,7028,7020,6870,6856,6591,6428,6385,6329,6461,6620,6525,6469,6262,5926,5747,5876,6252,6376,6507,6630,6627,6478,6468,6503,6339,6131,6348,6663,6628,6801,6742,6798,6830,6916,6768,6586,6496,6192,6038,6002,5772,5486,5271,4976,4763,4443,4190,3961,3686,3478,3206,3021,2907,2777,2695,2584,2515,2400,2341,2301,2118,2058,1980,1979,1878,1788,1726,1671,1557,1506,1431,1416,1409,1395,1427,1433,1425,1436,1390,1366,1384,1662,1990,2310,2634,2956,3288,3600,3851,4285,4674,5027,5186,5469,5739,5790,5826,5891,5784,5787,5890,5803,5672,5842,5826,5686,5427,5149,4806,4963,5227,5517,5727,5882,6082,5908,6017,6054,6043,6125,6109,6060,5997,6018,6190,6222,6327,6282,6473,6583,6763,6888,6848,6627,6766,6844,6932,6845,6776,6663,6452,6171,5965,5765,5536,5373,5478,5589,5654,5802,6031,6270,6489,6682,6788,7044,7051,7065,6988,6839,6689,6593,6535,6511,6500,6646,6779,6699,6582,6398,6115,5836,5956,5886,5872,6047,6288,6519,6768,6880,6993,6968,6767,6640,6624,6606,6546,6446,6309,6237,6137,5950,5881,5618,5438,5188,5186,5088,5070,4971,4895,4780,4481,4312,4221,4327,4326,4432,4686,4908,4855,4986,5145,5223,5183,5121,5161,4997,4912,5024,5197,5321,5438,5290,5260,5522,5533,5509,5486,5427,5284,5248,5222,5097,4840,4696,4571,4606,4583,4612,4686,4749,4846,4944,4861,4892,4767,4630,4724,4631,4854,5032,5087,5149,5192,5201,5143,5102,5098,5227,5461,5373,5167,4921,4823,4629,4658,4763,4639,4489,4608,4709,4837,4993,5120,5349,5504,5666,5742,5862,6025,6171,6035,5874,5655,5425,5406,5466,5464,5362,5408,5464,5491,5334,5313,5334,5297,5303,5213,5222,5199,5227,5219,5219,5407,5444,5502,5443,5259,5309,5267,5147,5031,4945,5044,5202,5322,5445,5605,5774,5872,6061,6235,6263,6176,6045,6019,5950,5934,5910,5868,6001,6113,6106,6191,6251,6307,6283,6212,6156,6067,6007,6001,6001,6034,6064,6088,6138,6172,6254,6385,6597,6604,6760,6606,6652,6805,6760,6651,6736,7010,7176,7266,7290,7152,6830,6650,6511,6307,6200,6145,6017,5889,5904,5880,5835,5771,5925,6113,6265,6427,6423,6423,6403,6290,6200,6081,6043,6072,6211,6286,6432,6631,6749,6574,6464,6424,6345,6357,6334,6506,6659,6554,6574,6408,6243,6199,6245,6213,6178,6316,6257,6136,6071,5994,5982,6009,6080,6070,5935,5916,5923,5816,5721,5586,5455,5463,5569,5585,5700,5763,5860,5920,6030,6024,6060,6112,6219,6173,6155,6177,6247,6305,6349,6422,6494,6396,6260,6145,6062,6066,5998,6094,6126,6209,6150,6088,6011,5972,5938,5946,5935,5934,5915,5957,6022,6204,6421,6615,6807,6962,7041,7082,7208,7276,7300,7330,7316,7128,6945,7014,7027,7095,7098,7168,7267,7385,7366,7517,7481,7310,7259,7116,6947,6786,6605,6494,6420,6276,6205,6311,6444,6522,6608,6735,6705,6496,6616,6561,6399,6355,6248,6264,6404,6573,6630,6426,6358,6271,6185,6071,5881,5922,5826,5981,6069,6234,6424,6645,6873,7086,7130,6996,7041,6911,6766,6625,6412,6283,6133,5990,5934,5826,5700,5643,5585,5588,5583,5600,5666,5663,5745,5895,6048,6167,6262,6441,6639,6814,7011,7001,6921,6944,6959,6867,6935,6904,6718,6557,6360,6135,5971,5808,5702,5591,5447,5455,5314,5200,5042,5071,5221,5183,5151,5299,5426,5506,5581,5699,5753,5851,5990,6184,6327,6193,6099,5952,5681,5495,5377,5399,5416,5478,5564,5742,5946,5970,6150,6338,6468,6549,6420,6328,6301,6154,5995,5854,5733,5807,5913,5949,6010,5984,5983,5907,5782,5641,5580,5574,5561,5607,5616,5693,5688,5691,5804,5932,6067,5961,5921,5942,5905,5806,5734,5622,5549,5441,5361,5275,5291,5252,5153,5123,5063,5089,5135,5150,5256,5349,5350,5473,5528,5560,5620,5636,5597,5461,5403,5349,5286,5282,5304,5266,5333,5325,5327,5478,5632,5791,5989,6204,6372,6422,6184,6011,5997,6069,6199,6221,6106,6068,6006,5758,5725,5938,6101,6250,6328,6318,6365,6447,6526,6408,6272,6383,6356,6508,6676,6603,6605,6515,6612,6626,6377,6219,6246,6473,6587,6866,6737,6523,6290,6358,6437,6204,6152,6031,6026,5928,5735,5546,5428,5301,5351,5332,5218,5399,5517,5706,6000,6108,6093,5874,5562,5357,5345,5593,5761,5815,5760,5762,5697,5524,5381,5238,5091,4910,4785,4812,4806,4761,4685,4710,4733,4758,4813,4878,4813,4815,4859,5032,5155,5291,5430,5562,5715,5845,5916,6142,6299,6288,6294,6364,6449,6392,6118,5965,5745,5537,5441,5352,5482,5641,5740,5935,6160,6251,6230,6188,6297,6336,6402,6419,6236,6258,6440,6341,6277,6311,6169,5938,5797,5761,5885,5864,5734,5557,5383,5215,5048,4873,4694,4544,4322,4447,4681,4923,4946,4904,5009,5126,5336,5523,5597,5748,5884,5885,5956,6100,6213,6496,6733,6713,6437,6279,6108,5994,5783,5602,5548,5735,5768,5565,5567,5560,5663,5458,5374,5274,5348,5178,5007,5007,4881,4837,4758,4685,4601,4589,4633,4744,4886,5033,5029,4947,4826,4686,4534,4405,4382,4406,4510,4460,4604,4767,4967,5064,4988,4923,4646,4410,4287,4288,4173,4033,3873,3835,3642,3430,3331,3449,3545,3707,3999,4278,4298,4220,4179,4111,3975,3842,3652,3532,3511,3474,3459,3363,3380,3330,3294,3335,3302,3252,3256,3268,3251,3241,3235,3247,3265,3319,3387,3571,3804,3887,3869,4001,4002,3887,3941,4183,4173,4070,3938,4064,4199,4385,4518,4456,4383,4437,4521,4320,4175,4250,4349,4393,4559,4704,4814,5038,5282,5609,5887,6039,6031,5862,5699,5446,5311,4975,4847,5127,5297,5406,5509,5491,5255,4911,4609,4333,3998,3630,3349,3280,3077,2911,2795,2814,3155,3497,3858,4113,4294,4274,4346,4110,3774,3514,3546,3712,3875,3951,4061,4090,4053,4094,4050,4184,4379,4313,4430,4365,4329,4446,4252,4034,4048,3971,4139,4125,4218,4267,4288,4340,4300,4257,4057,3981,3908,3801,3757,3885,4058,4175,4275,4202,4243,4093,3870,3782,3890,4131,4115,4053,3968,3861,3741,3435,3064,2765,2417,2072,1669,1363,982,890,879,814,796,699,799,650,327,121,174,153,163,271,293,334,370,347,527,609,711,800,934,1256,1546,1851,1874,2027,2327,2676,2892,3258,3430,3431,3226,3038,3101,3027,3108,3268,3066,2682,2355,2009,1793,1766,1728,1487,1460,1437,1481,1668,1908,2194,2469,2686,2937,3069,2956,3114,2973,2785,2514,2285,2189,1990,1678,1391,1244,1180,1152,1187,1201,1158,966,1031,1189,1192,1139,942,1055,1352,1620,1850,2090,2166,2253,2318,2576,2779,2900,3114,3332,3263,3328,3532,3782,3966,4049,3842,3655,3544,3520,3469,3269,3211,3356,3444,3471,3497,3518,3505,3620,3821,3991,4128,4214,4228,4273,4499,4746,4953,4893,4853,4776,4678,4654,4767,4894,4809,4725,4681,4813,4917,5039,5037,5107,5104,5014,4856,4871,4775,4603,4461,4297,4266,4245,4087,4149,4276,4263,4108,3934,3960,3983,4068,4043,4080,4014,3940,3838,3675,3500,3354,3653,3788,4020,4302,4450,4448,4387,4308,4137,3859,4008,4074,4275,4410,4587,4859,4838,4987,5195,5382,5581,5726,5880,6027,6054,6100,6095,6015,5943,5818,5735,5803,5900,6086,6080,6075,6024,6110,6100,6070,5915,5819,5724,5579,5417,5266,5123,4960,4790,4670,4527,4612,4674,4747,4803,4703,4551,4475,4623,4750,4929,5095,5097,5110,5092,5129,4984,5145,5327,5494,5680,5467,5288,5092,5047,5071,5054,5065,5015,4987,4927,4988,5204,5403,5630,5842,5771,5809,5639,5646,5758,5769,5884,6080,6206,6394,6163,5985,5993,5989,6104,6296,6637,6808,7049,7081,6914,7026,6873,6645,6274,5959,5697,5711,5398,5133,5073,5051,4802,4843,4890,4902,4913,5161,5418,5666,5953,6231,6433,6548,6422,6326,6124,5882,5820,5662,5491,5400,5157,4888,4633,4422,4573,4761,4923,5134,5262,5360,5473,5559,5539,5440,5264,5096,5137,5193,5158,5140,5097,5049,5039,4964,4923,4864,4774,4680,4609,4379,4147,4171,4353,4590,4774,4843,5077,5336,5506,5729,5671,5631,5590,5681,5700,5725,5794,5541,5392,5629,5443,5432,5473,5281,5167,5151,5393,5727,5783,5579,5477,5409,5361,5447,5634,5826,6124,6352,6170,6148,5967,5917,5977,5942,6123,6332,6187,6183,6341,6447,6411,6339,6189,6124,6096,5875,5691,5698,5847,6095,6136,6070,5956,5879,5817,5902,5830,5543,5417,5267,5120,4975,4850,5100,5099,4945,4861,4791,4826,4802,4887,4983,5116,5225,5227,5268,5220,5024,4871,4747,4758,4817,4940,5107,4932,4944,5088,5311,5568,5511,5289,5155,4997,4786,4701,4685,4429,4476,4507,4228,3922,3644,3613,3982,3732,3798,4066,4317,4559,4617,4638,4609,4321,4286,4472,4611,4643,4344,4305,3926,4004,3916,3742,3696,3964,4189,4081,3844,3689,3750,3752,3615,3537,3491,3639,3578,3705,3697,3962,3970,3628,3920,4208,4309,4451,4400,4330,4206,3975,3805,3666,3488,3202,3154,3128,3178,3385,3472,3271,3006,3028,3237,3481,3740,3797,3956,4208,4509,4774,4908,5193,5409,5475,5424,5314,5178,5367,5476,5143,5145,5320,5595,5924,5807,5513,5637,5736,5552,5179,4939,5075,5310,5010,4685,4383,4071,3840,3567,3343,3242,3325,3211,3221,3307,3482,3670,3940,4202,4420,4666,4854,5095,5279,5520,5552,5444,5395,5436,5324,5150,4965,4780,4606,4395,4125,3906,3655,3433,3173,3029,3081,3178,3265,3219,3290,3342,3391,3655,3917,4038,4247,4309,4419,4452,4673,4882,5086,5290,5507,5526,5307,4971,4644,4551,4267,3932,3957,4215,4438,4464,4455,4445,4457,4643,4873,4945,5069,5282,5539,5805,5636,5459,5142,4971,4881,4833,5054,5642,5495,5310,5212,4994,5154,4919,4585,4425,4652,4562,4534,4798,5235,5102,4829,4607,4608,4682,4906,5139,4858,4519,4349,4119,4014,3927,3839,3795,3869,3975,4131,4436,4612,4896,5028,4971,4969,4819,4685,4471,4241,4066,4220,4212,4535,4836,5146,5212,5121,5086,5109,5232,5534,5475,5327,5108,4752,4376,4399,4620,4842,4971,4900,5131,5425,5362,5178,4969,4794,4874,4977,4813,4543,4294,4267,4547,4788,4985,5259,5494,5430,5442,5500,5411,5647,5638,5546,5436,5632,5657,5388,5073,5114,5366,5408,5502,5726,5874,5918,5943,5976,6229,6470,6322,5997,5742,5472,5215,4889,4623,4164,4040,3988,3892,3751,3729,3806,3953,4137,3933,4029,4459,4715,5029,5319,5595,5702,5545,5596,5729,5457,5397,5718,6022,6278,5926,5586,5297,5049,4796,4539,4348,4019,3727,3475,3453,3748,3994,4238,4532,4861,5195,5492,5704,5915,5782,5782,5933,5708,5420,5111,4839,4549,4231,3958,3721,3536,3374,3214,3040,2900,2744,2622,2555,2501,2425,2353,2485,2652,2718,2778,2845,2739,2725,2839,3049,3293,3548,3750,3949,4162,4351,4542,4520,4674,4955,5250,5516,5765,5964,5717,5483,5237,5055,5326,5338,5386,5104,4805,4685,4432,4077,3893,3613,3549,3471,3295,3230,3139,2984,2855,2794,2759,2718,2670,2609,2567,2473,2296,2170,2114,2200,2161,2093,2093,1987,1888,1858,1612,1635,1932,2181,2001,1994,2248,2183,2149,2169,2206,2179,2486,2548,2676,2811,2614,2804,3066,3191,3108,3209,3119,3138,3235,3378,3468,3551,3595,3631,3748,3864,3992,4133,4289,4418,4512,4669,4783,4829,4922,5141,5294,5297,5476,5724,5957,6184,6420,6643,6815,6860,6880,6759,6461,6256,6176,6149,6250,6272,6486,6457,6162,5864,5578,5311,5049,4803,4715,4584,4406,4351,4335,4317,4311,4261,4314,4541,4777,5009,5263,5513,5706,5955,6216,6489,6736,6812,6776,6655,6682,6840,6968,6977,6749,6729,6527,6467,6410,6273,6281,6193,6357,6595,6886,6928,6926,6790,6702,6673,6492,6322,6405,6676,6568,6308,6281,6297,6277,6185,6012,5811,5803,5966,6036,5809,5539,5309,5102,5304,5478,5754,6043,6329,6505,6480,6157,5884,5969,6267,6613,6667,6610,6620,6694,6836,7021,6915,6659,6342,6103,6003,5869,5709,5580,5360,5228,5147,5045,4947,4721,4500,4231],g:[0,0,10,14,0,62,49,0,14,146,116,156,59,97,68,245,96,1,37,44,0,23,12,0,3,0,0,0,0,0,277,358,157,179,149,17,58,0,0,16,86,54,161,96,47,0,0,33,36,56,17,63,116,233,157,69,121,23,165,134,70,54,140,194,219,126,41,243,145,15,16,16,177,195,198,132,92,5,0,19,179,18,12,39,1,38,66,32,8,0,17,0,33,0,92,98,4,38,30,20,0,0,113,134,29,0,15,37,3,0,0,0,48,50,21,86,0,4,52,0,9,20,0,0,111,82,62,69,7,61,0,0,0,0,0,0,0,0,34,167,0,1,64,44,0,0,0,0,0,1,8,117,159,234,159,55,69,43,19,20,45,109,34,6,40,0,31,48,13,55,144,154,20,21,0,0,77,84,81,123,129,135,69,142,90,4,88,34,0,0,0,8,0,0,0,0,0,0,0,73,50,0,7,36,37,152,38,0,52,35,6,0,0,0,0,0,6,27,37,25,208,117,17,0,35,99,84,202,191,217,19,110,172,116,206,188,130,67,103,0,168,0,5,135,51,62,19,3,5,171,111,132,111,20,0,0,0,4,14,12,0,0,0,0,0,0,0,10,3,81,43,2,50,0,103,250,165,174,124,0,43,147,43,52,99,149,150,104,0,0,219,46,0,77,113,94,7,52,42,0,93,69,100,43,55,183,166,175,103,186,188,145,55,242,200,38,43,66,131,66,73,90,0,0,0,0,289,407,335,89,319,19,0,0,0,22,271,86,173,187,36,297,249,139,18,0,12,339,70,0,8,290,310,253,63,0,0,0,0,123,179,215,153,191,41,0,55,101,0,159,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,18,26,29,66,110,131,90,151,86,149,152,185,176,246,361,0,0,120,76,0,0,0,92,104,102,94,288,37,139,222,147,145,62,45,0,0,80,124,126,130,139,152,123,118,161,188,171,163,183,156,196,213,184,225,215,286,289,75,259,159,252,215,221,163,221,7,48,34,113,190,159,30,8,0,0,0,118,185,184,157,14,0,0,0,172,149,148,28,106,0,0,0,0,0,0,0,0,0,0,0,143,128,0,0,15,0,0,121,47,83,10,2,0,92,58,24,15,40,10,10,107,200,173,205,156,46,0,0,27,0,0,4,27,138,136,178,32,0,0,24,90,93,42,63,8,0,0,0,0,0,0,0,0,0,27,0,8,71,8,0,0,0,0,0,0,0,0,0,16,0,33,0,112,3,34,1,0,0,0,12,15,0,2,0,6,16,15,51,0,47,21,5,0,4,38,73,0,12,112,0,19,2,10,14,9,23,2,0,3,93,162,236,18,0,9,0,15,33,143,80,36,4,0,17,0,6,38,0,0,28,173,50,11,42,167,19,2,0,0,80,81,95,106,187,119,84,0,0,22,1,0,7,116,86,35,31,71,108,34,0,0,0,0,0,0,74,20,82,172,203,108,32,66,52,9,93,144,193,187,188,143,163,205,231,124,38,128,110,133,127,187,154,194,199,26,186,159,175,242,187,183,179,244,197,139,0,0,0,148,130,71,0,0,0,36,0,0,0,60,25,27,4,119,13,24,0,0,51,332,352,349,341,339,358,370,90,0,41,0,92,251,20,0,0,0,0,0,17,0,0,0,96,335,383,307,0,0,0,98,0,0,0,1,57,9,0,16,291,204,204,273,86,9,102,317,0,0,0,0,1,102,5,0,0,0,39,3,39,0,8,0,0,14,140,202,80,74,142,146,247,142,188,119,26,11,0,0,1,0,0,0,0,0,0,0,18,245,180,243,78,0,0,48,20,45,9,73,26,0,0,175,68,36,212,223,163,203,70,0,0,13,0,16,80,106,36,0,0,0,0,0,75,10,0,0,0,0,0,110,84,78,0,0,37,6,0,72,275,216,147,0,15,7,217,171,0,0,1,0,0,0,132,64,66,0,25,51,21,39,82,57,176,16,3,109,287,155,271,286,205,94,260,63,0,0,1,0,0,15,151,17,0,261,272,171,148,35,0,0,0,77,31,54,34,0,5,24,0,0,78,81,34,100,0,73,287,277,190,0,0,0,9,27,0,4,0,0,0,0,126,223,263,330,223,112,193,24,36,28,33,40,96,58,51,159,83,85,69,96,82,0,3,0,51,15,2,0,40,308,264,205,110,4,1,0,57,151,10,84,77,0,0,0,0,0,0,0,0,60,14,26,116,102,12,99,4,87,0,19,24,0,0,0,0,9,1,0,0,0,27,70,74,54,1,3,1,1,1,0,3,1,2,1,1,3,0,0,0,0,4,18,41,160,42,8,3,24,95,53,105,119,147,143,179,147,201,18,358,281,22,100,20,116,4,0,0,97,261,271,242,168,251,169,111,61,5,0,9,61,0,0,0,5,0,42,0,0,0,0,0,16,0,0,29,47,84,196,101,45,11,91,80,61,0,0,0,0,0,0,12,5,0,150,68,259,304,254,314,270,161,242,206,166,0,125,70,18,11,0,0,10,214,235,173,93,0,2,3,1,44,21,20,8,0,0,3,27,90,0,0,0,85,177,61,84,48,4,90,35,85,103,85,55,0,67,181,81,189,260,0,0,159,288,83,20,0,0,21,232,250,109,30,204,75,80,32,22,146,113,16,0,0,0,0,30,44,86,37,106,152,0,0,0,0,0,0,0,0,0,0,0,0,0,40,242,201,193,94,17,113,0,31,129,56,0,57,168,98,0,54,279,301,58,3,0,179,1,0,0,0,140,171,231,268,282,204,273,40,0,0,0,16,46,157,2,44,181,7,8,71,117,64,21,35,0,31,163,77,0,61,23,5,0,0,0,0,0,0,0,0,0,108,173,230,275,238,62,90,127,187,16,2,65,232,112,262,102,7,0,0,0,0,0,0,0,0,0,2,305,161,208,52,0,0,0,1,100,256,199,218,211,305,174,179,135,105,49,8,26,26,74,0,0,0,0,0,0,7,0,0,234,89,299,253,177,265,186,257,156,132,122,190,96,0,0,0,0,0,0,0,0,0,0,0,0,44,15,0,50,64,0,13,0,0,76,58,127,46,17,74,31,23,38,12,21,36,48,25,53,54,69,115,201,156,63,92,136,105,120,136,202,292,124,0,7,85,186,153,0,0,0,46,89,92,55,111,216,260,262,235,296,275,285,82,218,117,62,0,0,0,0,0,0,0,0,9,62,1,1,24,196,245,181,153,184,256,202,150,125,2,0,76,14,35,0,0,0,1,0,0,0,21,117,173,186,188,22,113,75,202,27,37,15,151,31,62,85,48,80,145,168,0,0,33,43,12,0,0,0,34,3,0,0,0,0,0,0,0,14,366,388,125,204,234,0,0,23,26,107,0,101,336,91,11,137,160,0,0,0,247,128,148,220,233,15,0,0,54,214,202,200,249,118,232,150,189,332,231,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,355,399,381,86,173,196,318,448,43,0,0,0,31,23,1,4,0,0,0,0,0,0,0,0,0,0,199,232,160,198,282,200,361,304,232,251,185,243,85,213,344,48,0,0,0,0,0,0,0,0,164,174,161,128,224,160,193,197,101,190,249,61,0,0,0,0,4,0,0,0,0,0,0,0,0,11,0,0,0,0,0,0,0,107,75,51,36,133,155,92,132,75,248,96,108,215,323,354,266,237,159,230,208,288,57,232,28,0,0,1,0,2,0,0,0,9,49,12,3,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,3,0,4,0,0,0,10,3,0,35,17,33,113,193,143,292,318,395,328,187,180,14,138,32,103,254,123,168,0,0,0,0,0,0,0,0,0,0,0,0,0,3,45,177,287,313,139,28,0,0,0,0,0,0,0,78,55,268,263,250,153,376,331,110,314,237,168,131,300,0,0,0,0,0,0,0,167,162,215,394,295,11,31,142,0,0,83,273,172,4,0,10,153,71,2,0,0,0,0,0,0,0,75,17,0,0,0,0,0,0,0,0,0,0,6,208,64,13,0,23,70,60,25,59,32,82,92,217,87,47,241,185,178,216,232,229,52,41,16,91,49,7,109,92,109,123,113,172,57,30,0,0,8,185,208,128,165,112,161,328,112,0,0,0,0,1,10,0,1,0,7,2,1,8,0,0,4,5,0,0,0,0,0,0,43,1,0,0,37,38,3,19,0,4,1,12,0,0,7,205,109,258,43,135,127,1,22,32,88,84,86,67,23,0,5,120,152,360,367,0,151,1,145,0,0,0,0,0,166,320,85,203,284,290,280,0,0,0,5,57,216,27,0,0,0,0,0,95,406,310,344,259,92,34,0,39,35,0,0,0,1,51,320,307,43,0,2,240,191,356,287,32,8,25,0,0,48,97,37,52,108,65,13,29,41,141,83,27,34,114,89,147,251,119,6,115,12,0,0,0,12,10,0,1,39,0,0,1,17,15,120,216,135,79,200,348,298,242,251,128,21,19,15,60,205,53,30,49,132,25,44,0,0,0,12,2,49,187,219,243,152,68,0,0,0,0,0,0,0,0,0,0,0,0,254,313,166,0,66,21,197,37,0,200,292,172,32,0,8,59,57,62,0,53,57,0,13,0,9,82,243,121,0,64,222,233,280,72,0,0,0,0,0,90,221,188,0,107,49,89,78,0,5,77,0,4,0,32,0,7,61,0,163,252,2,66,230,0,0,77,27,0,35,170,74,4,3,43,8,37,102,47,62,171,234,107,30,172,234,179,0,0,131,76,45,44,0,0,0,149,253,177,152,0,0,12,35,26,209,19,0,0,0,8,80,296,9,145,116,97,15,0,17,9,12,172,0,0,0,0,40,44,0,0,155,173,30,36,7,108,1,0,140,184,223,259,48,11,0,7,17,3,0,1,0,3,26,302,284,97,177,269,272,223,0,0,0,0,0,23,0,0,27,169,73,0,0,27,238,49,122,44,0,0,0,0,4,12,14,0,0,0,2,58,0,0,122,140,130,56,154,164,206,245,100,0,0,0,158,187,205,61,31,24,0,56,36,81,26,27,0,0,0,0,0,0,77,135,307,284,166,220,234,4,28,45,0,0,0,149,172,150,332,345,5,0,5,5,1,2,0,21,200,10,0,0,0,0,18,15,192,0,10,163,52,4,94,42,87,150,165,201,69,11,185,239,112,0,0,0,0,99,175,152,0,0,75,181,195,18,23,0,0,113,3,0,32,208,236,142,0,0,0,146,231,51,0,0,0,0,0,89,15,0,0,0,0,0,0,23,161,57,0,4,125,126,59,0,0,0,0,0,0,4,0,0,0,0,29,59,59,0,33,218,221,228,254,212,239,83,39,234,195,140,279,151,102,128,63,0,0,0,0,0,0,0,17,229,172,201,114,181,205,168,7,0,100,153,20,151,0,33,10,0,0,110,132,11,0,0,0,2,109,258,238,196,0,0,0,0,0,0,0,0,0,99,126,191,260,0,17,304,183,162,0,0,5,179,120,0,0,0,87,15,0,0,0,87,0,0,226,12,0,0,0,41,108,1,0,0,0,0,96,43,0,0,0,0,0,0,0,0,146,260,177,0,0,0,98,240,251,178,56,242,131,291,158,319,129,239,215,88,69,27,72,8,13,0,0,0,74,83,5,0,93,15,1,0,156,232,206,191,191,159,68,69,131,111,0,15,20,45,41,30,23,0,0,0,28,4,58,53,0,0,0,0,0,0,0,0,0,0,0,0,0,4,107,118,49,1,209,381,303,232,25,82,181,50,311,194,181,98,254,234,161,206,319,293,168,237,257,282,185,0,0,9,76,0,0,14,0,80,87,153,157,172,119,51,13,0,31,15,33,1,0,48,4,0,53,53,1,0,0,84,212,123,70,19,246,238,223,198,0,29,220,5,0,0,0,0,0,0,0,0,0,0,0,0,36,4,0,0,11,80,91,21,46,2,181,117,212,195,64,5,0,72,124,115,0,0,0,0,0,49,20,42,189,241,237,127,74,66,17,4,110,180,19,164,0,0,0,0,184,353,131,75,0,123,122,69,81,40,44,191,51,6,21,2,3,0,0,3,4,44,0,2,2,26,15,45,5,5,0,0,0,0,0,0,0,0,0,0,0,0,6,0,48,0,0,0,24,13,7,17,0,10,0,0,6,158,283,103,0,0,5,0,0,3,144,71,5,0,0,17,76,46,41,34,77,46,30,0,20,4,0,0,0,22,0,18,0,0,0,4,0,0,4,0,97,2,0,0,25,40,0,0,0,0,0,3,0,0,40,0,0,0,8,16,120,105,78,29,0,0,2,24,0,20,27,0,0,1,11,4,36,35,0,0,5,4,0,0,4,107,144,183,9,9,0,84,64,189,174,201,162,180,149,194,141,111,69,65,199,103,71,0,0,149,101,141,197,61,36,55,30,0,0,28,57,96,63,54,0,23,211,185,0,21,10,0,15,77,0,30,135,26,130,200,226,72,115,92,2,60,64,0,0,61,14,11,9,0,42,65,112,15,43,0,101,58,4,207,111,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,5,0,0,0,9,23,3,43,18,141,205,149,199,205,199,70,57,64,70,178,142,11,0,0,0,67,33,11,34,2,0,0,203,225,290,289,203,83,167,121,161,169,89,5,59,0,0,0,2,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,37,246,71,38,170,190,35,20,91,10,0,189,26,88,195,106,90,49,18,314,56,311,303,298,315,322,275,273,174,14,119,84,100,104,100,49,97,190,74,40,29,34,155,52,32,14,2,0,17,0,116,30,139,22,38,10,156,10,73,109,91,171,85,93,100,36,0,0,0,0,8,25,0,0,0,0,0,4,40,9,0,0,0,0,0,0,0,82,59,0,3,102,147,124,73,0,0,0,0,0,0,0,5,0,3,15,33,49,18,14,34,57,2,25,5,0,0,0,0,91,285,192,255,118,123,117,70,0,0,0,78,254,241,138,116,41,146,159,31,0,0,83,125,0,13,0,33,0,0,0,0,29,0,0,0,0,0,163,252,283,247,177,4,35,129,186,0,0,206,284,4,0,6,0,12,0,11,237,298,11,14,0,113,97,0,0,16,96,218,57,137,240,16,0,0,0,0,0,156,179,108,10,93,260,53,0,2,63,0,6,21,0,99,129,89,58,62,0,1,65,158,40,0,75,5,0,121,90,94,284,33,326,45,8,47,0,0,8,0,132,159,10,3,0,0,0,128,376,124,142,123,45,0,1,57,0,2,217,314,26,214,3,56,38,87,0,0,17,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,3,0,7,16,0,0,0,21,1,0,14,2,0,3,0,12,1,9,35,26,14,29,12,0,19,278,328,321,324,321,333,311,251,433,390,353,159,283,270,72,65,95,25,64,103,1,2,170,37,0,0,0,0,193,263,290,211,155,200,0,111,51,13,86,8,0,0,82,179,41,106,20,191,110,180,125,14,0,139,79,105,0,15,0,0,0,0,0,0,2,114,111,66,148,229,239,219,192,106,256,44,25,13,0,0,0,0,0,31,146,142,0,0,0,0,0,134,0,7,176,241,231,249,112,113,12,0,0,22,13,14,1,0,0,0,0,9,0,0,0,40,11,25,0,0,0,0,0,0,107,14,119,254,222,15,131,159,122,54,2,58,0,1,112,173,127,117,0,97,263,21,11,3,0,0,15,45,0,0,0,7,119,39,35,74,64,97,98,0,61,0,0,110,0,222,179,54,62,52,25,0,0,11,129,234,41,0,0,0,0,38,116,0,0,124,101,128,156,127,229,155,162,75,120,163,146,0,0,0,0,13,60,24,0,62,77,45,0,20,28,0,16,0,22,7,41,22,41,188,38,58,4,0,50,19,0,0,0,99,157,120,123,160,169,98,189,174,36,0,0,6,0,4,8,6,133,112,14,84,61,56,0,0,0,0,0,3,18,33,30,31,50,35,81,131,212,48,156,2,53,152,19,0,101,274,165,107,68,44,0,0,0,0,0,0,0,0,37,11,8,12,154,187,153,161,30,7,7,0,0,0,0,29,139,75,146,200,117,0,0,13,24,37,44,172,153,0,34,0,0,0,46,17,1,138,14,0,0,0,6,29,71,10,0,0,25,0,0,0,0,14,107,30,114,64,97,60,110,24,57,52,106,17,13,22,70,77,48,74,72,0,0,0,0,18,6,97,31,84,0,0,0,0,0,9,12,6,4,43,65,182,217,194,191,155,79,40,126,68,56,47,16,0,0,69,36,68,12,70,99,121,42,151,44,0,0,0,0,0,0,0,0,0,1,106,133,78,86,127,23,0,121,17,0,9,0,33,143,169,85,0,0,0,0,0,0,60,0,155,89,165,190,221,228,213,91,0,45,8,0,0,0,0,0,0,9,0,0,0,0,15,9,20,66,18,81,151,153,119,94,179,199,175,197,29,0,44,35,6,68,36,0,0,0,0,0,0,0,0,0,26,0,0,0,47,149,1,44,148,126,88,78,119,54,98,140,193,146,0,0,0,0,0,0,22,29,62,86,178,204,54,180,187,131,81,0,0,19,0,0,0,0,76,106,36,63,9,6,0,0,0,1,8,0,46,17,77,35,24,114,128,135,0,6,25,0,0,0,0,0,0,1,17,42,1,0,4,0,41,46,19,106,93,21,122,57,33,60,29,15,0,0,0,0,0,25,0,67,11,35,151,154,159,198,215,168,74,0,0,2,72,130,28,0,18,39,0,12,213,163,149,86,5,64,82,80,0,0,114,6,151,168,1,32,1,142,23,0,0,47,227,114,279,0,0,0,74,109,0,0,0,7,0,0,0,0,0,49,6,0,181,118,189,294,117,8,0,0,0,51,248,168,61,0,16,12,0,0,0,0,0,0,28,7,1,0,29,23,26,55,65,0,17,54,172,124,136,139,133,152,130,71,226,157,14,6,71,84,28,0,0,0,0,1,0,130,159,99,195,225,103,20,36,136,58,94,34,0,30,182,3,8,60,0,0,0,40,124,2,0,0,0,0,0,0,0,0,0,125,234,242,81,16,106,117,210,187,78,151,136,6,89,143,114,283,237,124,0,0,0,0,0,0,30,188,33,0,26,21,130,0,0,0,78,0,0,40,0,2,0,0,1,17,45,111,142,147,24,0,0,0,0,0,0,36,105,1,144,163,199,97,20,53,0,0,0,10,0,0,0,4,0,0,13,117,96,161,293,279,30,0,0,0,0,1,0,0,2,0,8,1,22,8,0,41,11,0,8,16,24,0,0,11,18,54,68,184,233,87,4,132,24,0,54,242,20,0,0,136,136,186,133,0,0,69,98,0,0,94,100,48,167,144,111,224,243,328,278,152,26,0,0,0,7,0,47,281,170,109,111,5,0,0,0,0,0,0,0,0,0,0,0,29,341,342,361,255,198,39,99,0,0,0,96,166,163,76,111,50,12,47,20,134,197,0,118,15,50,143,0,0,30,19,168,24,92,54,22,51,17,24,17,18,8,0,0,127,173,118,106,0,59,6,0,14,120,241,3,0,28,7,5,0,0,0,0,0,0,0,0,13,40,16,34,13,106,0,0,0,95,0,42,133,49,41,55,38,179,107,102,89,134,322,291,305,99,160,300,349,217,366,171,26,0,0,95,25,87,160,0,0,0,0,0,31,2,0,32,9,54,188,240,286,276,216,251,141,0,158,3,0,0,0,8,10,9,0,0,0,0,44,30,22,0,79,158,22,0,0,147,297,268,229,240,110,89,67,258,204,121,214,218,25,65,204,251,183,89,0,0,0,7,25,0,15,144,88,27,31,34,12,115,201,170,138,86,21,56,226,247,207,20,49,0,0,12,113,127,0,0,7,131,104,122,13,70,25,0,0,24,0,0,0,0,1,2,0,75,127,4,0,0,56,25,85,2,43,0,12,6,0,0,6,299,135,232,282,179,22,16,4,0,0,149,66,201,135,178,272,10,149,208,187,200,144,154,148,28,47,27,3,0,0,0,68,97,186,17,16,20,86,10,3,0,0,0,0,0,0,0,0,0,0,0,86,62,73,56,0,0,0,148,127,179,166,12,27,7,56,0,161,182,167,186,0,0,0,0,24,6,22,7,0,0,61,216,199,227,211,23,38,0,46,112,60,115,196,126,221,0,0,21,13,134,193,341,171,241,114,7,129,0,0,0,0,27,105,0,0,22,15,0,92,46,14,25,248,257,248,287,278,202,116,0,0,0,0,13,0,0,0,0,0,0,0,152,188,163,211,128,99,113,86,22,0,0,0,42,56,2,6,7,3,27,0,8,0,0,0,0,0,0,59,182,236,184,69,235,258,173,223,3,30,11,92,34,49,86,0,34,237,0,45,42,0,0,19,241,334,115,0,0,0,0,92,187,193,298,249,1,6,0,2,83,0,184,209,0,52,158,107,44,0,0,0,14,0,0,23,149,248,60,3,0,0,18,86,44,0,0,0,0,0,0,250,41,0,2,0,52,15,93,106,133,109,10,41,5,0,0,0,19,69,123,198,0,81,153,224,256,43,0,0,0,0,0,3,0,76,43,0,0,0,98,370,0,93,268,252,241,77,48,17,0,52,187,143,116,0,43,0,83,0,0,0,268,225,1,0,0,70,46,0,12,29,161,12,127,45,264,95,0,292,288,101,182,19,45,3,0,0,0,0,0,13,17,59,207,87,0,0,50,209,243,259,108,176,252,301,264,134,286,215,87,15,24,5,191,195,0,89,176,274,329,33,0,181,114,18,0,0,143,235,0,0,0,0,0,0,0,0,83,0,22,86,174,189,270,262,219,245,189,241,183,241,50,2,43,54,5,0,0,0,0,0,0,0,0,0,0,0,71,97,102,13,70,52,49,264,262,121,209,62,110,58,221,210,204,204,217,63,0,0,0,0,0,0,108,258,223,35,27,10,43,186,230,82,124,213,257,266,71,0,0,0,0,30,222,588,55,0,0,0,175,11,0,1,226,16,31,264,437,13,0,7,10,89,223,233,0,0,0,0,0,0,0,6,74,106,155,306,176,284,133,35,89,0,0,2,0,0,169,40,323,301,310,65,20,16,29,123,302,14,0,0,0,0,126,221,222,145,5,231,294,14,0,0,0,94,140,0,0,0,84,280,241,197,274,235,21,21,71,17,235,22,0,6,196,70,0,0,129,253,53,103,224,148,47,43,56,253,240,23,0,0,0,0,0,0,0,13,43,0,0,5,77,147,185,0,110,431,256,314,290,276,125,0,112,133,0,78,321,304,256,0,0,0,0,0,0,0,0,0,0,123,295,246,244,294,329,334,297,212,210,0,28,151,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,132,167,87,61,66,6,66,115,210,244,255,202,199,213,189,191,19,160,281,296,265,249,206,0,0,0,9,271,66,60,0,0,7,0,0,0,0,1,20,0,9,0,0,0,0,0,0,3,5,3,0,0,0,0,90,52,0,9,40,15,25,0,38,297,249,0,61,254,30,24,57,57,53,306,70,128,134,0,193,262,151,0,107,0,23,97,143,90,84,60,36,117,116,128,141,156,130,94,156,114,58,93,219,153,8,179,248,233,226,236,224,172,48,29,5,0,0,0,0,107,45,214,68,0,0,0,0,0,0,0,1,0,0,0,0,7,1,53,227,236,232,254,250,194,249,260,274,247,123,18,0,73,157,128,36,0,32,0,17,0,0,18,0,164,238,290,46,9,0,4,21,0,0,103,270,42,0,75,87,12,0,6,0,4,162,83,0,0,0,0,202,175,276,289,286,176,16,0,0,90,298,347,55,0,28,73,142,185,43,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],total:2653.0};
+const CAL=[[0, 0.0], [109.5, 109.8], [209.5, 205.8], [266.1, 264.8], [342, 336.2], [454.5, 447.3], [517.6, 510.1], [651.3, 645.2], [702.2, 695.1], [779.5, 772.9], [838.6, 834.1], [906.6, 904.9], [942.5, 941.5], [1016.9, 1015.8], [1048.3, 1047.6], [1076.4, 1075.9], [1092.3, 1091.5], [1153.4, 1152.4], [1195.4, 1198.1], [1284.3, 1286.1], [1331.1, 1330.3], [1419, 1417.9], [1501.2, 1501.1], [1656.9, 1654.7], [1718.7, 1717.3], [1821.9, 1820.1], [2000.9, 1999.1], [2094.3, 2097.5], [2147.1, 2147.4], [2294.9, 2296.0], [2325, 2324.2], [2394.1, 2394.0], [2464.1, 2464.5], [2588.9, 2591.6], [2620.6, 2622.6], [2650.1, 2653.0]];
+function nom2trk(m){
+  if(m<=CAL[0][0]) return CAL[0][1]+(m-CAL[0][0]);
+  for(let i=1;i<CAL.length;i++){
+    if(m<=CAL[i][0]){const [a,ta]=CAL[i-1],[b,tb]=CAL[i];return ta+(m-a)/(b-a)*(tb-ta);}
+  }
+  return CAL[CAL.length-1][1]+(m-CAL[CAL.length-1][0]);
+}
+function trk2nom(t){
+  if(t<=CAL[0][1]) return CAL[0][0]+(t-CAL[0][1]);
+  for(let i=1;i<CAL.length;i++){
+    if(t<=CAL[i][1]){const [a,ta]=CAL[i-1],[b,tb]=CAL[i];return a+(t-ta)/(tb-ta)*(b-a);}
+  }
+  return CAL[CAL.length-1][0]+(t-CAL[CAL.length-1][1]);
+}
+function eleAtTrk(d){const x=Math.max(0,Math.min(d,ELE.total))/ELE.step;const i=Math.min(ELE.e.length-2,Math.floor(x));const t=x-i;return ELE.e[i]+(ELE.e[i+1]-ELE.e[i])*t;}
+function eleAtMile(m){return eleAtTrk(nom2trk(m));}
+function gainLoss(mileA,mileB){
+  const lo=nom2trk(Math.min(mileA,mileB)), hi=nom2trk(Math.max(mileA,mileB));
+  const a=lo/ELE.step, b=hi/ELE.step;
+  let g=0;
+  for(let i=Math.floor(a);i<Math.min(Math.ceil(b),ELE.g.length);i++){
+    const f=Math.min(i+1,b)-Math.max(i,a);
+    if(f>0) g+=ELE.g[i]*Math.min(1,f);
+  }
+  const de=eleAtTrk(hi)-eleAtTrk(lo);
+  let up=g, down=g-de;
+  if(mileB<mileA){const t=up;up=down;down=t;}
+  return {up:Math.max(0,Math.round(up)),down:Math.max(0,Math.round(down))};
+}
+
+// ---------------- GPS ----------------
+const TRK={step:0.3,dlat:[325897,37,42,22,37,29,-9,-7,24,-5,12,-13,-14,5,14,3,12,12,4,32,27,29,29,26,27,24,2,-18,-29,-7,11,38,35,40,26,29,29,31,-2,20,15,0,12,0,28,32,-3,-26,-3,32,33,15,7,5,10,24,33,4,-7,0,24,32,27,25,6,14,32,24,8,16,28,24,-24,39,40,38,28,33,25,36,39,41,24,-1,-8,37,24,-17,-34,12,19,28,41,19,40,34,11,-21,-10,23,29,24,41,40,38,38,39,17,26,39,33,34,-13,21,39,36,28,20,35,41,33,24,33,15,19,38,39,27,41,37,39,41,34,38,25,6,38,41,33,31,37,26,38,36,15,36,26,31,-2,-38,0,34,9,-27,11,30,8,36,27,29,38,34,21,20,37,26,13,-36,-23,12,25,2,39,41,38,36,33,28,8,-5,26,15,12,8,31,25,34,30,18,31,35,13,18,22,27,17,27,30,37,33,37,31,29,37,33,5,-10,-6,5,-4,33,34,28,16,3,31,19,32,25,29,39,24,32,37,22,17,-15,39,23,34,38,17,1,-7,-24,4,28,-3,-8,5,4,-14,24,8,41,41,42,42,33,33,17,12,27,26,26,5,10,16,10,24,-5,4,31,18,-8,28,21,17,12,21,7,35,11,-19,37,35,12,4,24,-12,16,35,27,13,6,6,13,7,-10,19,3,14,27,2,21,25,21,37,36,25,0,15,23,22,26,-24,-19,29,25,26,13,31,34,21,14,25,-10,17,5,-4,15,29,4,13,12,20,2,21,17,28,27,12,25,10,19,14,4,29,37,41,41,36,33,10,26,22,8,5,38,33,13,22,3,6,17,15,21,18,-2,22,30,43,29,35,29,21,7,12,1,20,10,24,18,35,33,21,31,25,16,22,9,9,18,9,7,8,37,32,26,26,36,16,-25,-4,3,17,28,0,-11,19,-9,-1,21,27,25,38,26,33,21,26,22,29,26,19,13,24,18,30,28,7,24,36,14,29,31,31,29,14,23,30,30,28,28,26,32,33,39,-6,32,30,3,26,30,35,37,12,8,32,8,-4,19,24,25,34,24,13,18,22,11,17,24,32,0,29,16,19,29,23,22,21,21,18,19,27,16,24,18,24,25,34,18,13,7,28,25,13,9,11,31,27,21,29,22,24,35,27,36,34,30,2,16,21,20,21,35,33,35,2,34,35,34,36,39,28,34,39,34,31,39,35,23,28,34,32,10,26,42,29,40,41,36,17,33,25,33,16,17,3,26,12,7,12,17,29,23,37,32,14,10,36,41,40,39,29,22,40,6,11,12,25,31,2,22,35,36,-32,15,16,35,34,38,37,23,13,4,3,4,-12,-14,3,-30,20,37,37,36,41,29,18,9,13,34,29,-3,-13,-3,-14,-36,17,9,3,37,25,26,31,32,18,-6,32,37,36,3,33,34,27,22,21,19,31,24,25,12,21,8,1,18,37,13,34,25,11,20,26,-25,19,-9,4,10,-2,38,30,6,-11,36,-12,-4,36,32,11,-30,-20,12,27,20,-35,-27,-10,-19,34,22,10,-21,-9,26,33,38,32,25,7,8,-3,-15,-23,9,-25,-22,32,41,41,35,35,42,42,42,43,42,29,26,31,40,33,34,29,18,39,32,15,2,-3,2,10,36,37,39,36,31,26,35,2,26,3,19,20,17,20,31,11,10,32,37,39,39,37,36,31,32,20,5,27,38,21,-7,-13,-4,15,27,16,21,28,5,2,6,28,35,20,14,20,29,31,30,23,24,15,32,31,30,38,38,29,29,27,23,34,33,34,31,30,25,36,25,27,27,24,15,-4,-11,16,10,2,-6,4,-7,2,0,-5,-4,-15,0,12,22,19,29,-18,0,9,28,35,28,26,26,-6,-11,-3,-15,-16,15,22,9,-5,22,12,6,14,21,23,27,26,0,13,36,37,27,38,31,24,19,36,26,36,25,38,33,40,-7,33,-24,32,-20,-10,30,21,27,13,21,33,39,34,34,22,28,8,32,30,28,35,36,33,28,35,36,30,23,3,2,25,29,-1,22,27,28,-4,0,5,31,23,34,29,23,16,-16,0,-42,-34,-35,-4,21,-41,35,29,15,33,18,-25,-34,-15,-19,8,-5,-29,-14,6,11,8,-32,4,-7,-1,9,-24,-11,-27,-6,22,17,-13,-13,29,15,5,23,24,16,22,20,39,-11,31,-5,-19,-21,-7,18,-16,-6,13,-5,9,23,-15,0,-16,-20,-36,-35,-7,-18,-32,-23,-20,-7,9,9,4,4,-19,-10,2,4,-23,-17,10,30,-11,3,3,-20,-7,18,-7,-24,-3,-17,-3,18,1,-5,0,5,-5,-4,19,37,34,30,35,22,29,29,39,8,33,8,18,29,31,33,16,25,28,19,-27,14,14,26,24,30,27,12,20,18,-5,-17,30,-21,19,-10,28,-12,10,4,-9,-16,18,-3,10,5,20,-7,-28,-19,-7,-27,-38,-39,-8,-27,-25,2,-22,4,-16,-27,-18,-20,-20,17,-30,-36,-25,2,0,-8,-3,5,4,-18,10,2,-5,8,9,8,4,23,-3,-18,-14,-22,-28,-13,-27,-2,-22,-27,-26,-7,8,1,0,-7,1,3,4,-2,-19,3,-14,11,22,24,19,23,21,11,19,18,17,25,15,24,18,-5,14,9,6,27,7,2,1,-13,-8,9,7,1,13,-12,-9,-14,1,-9,-36,-37,-19,-22,-19,-23,-20,-17,-19,-3,-17,-32,5,21,14,29,4,5,10,10,-24,-25,-17,-20,-22,-22,-6,13,23,6,5,16,-15,-16,25,30,-6,9,33,7,24,26,7,29,30,-13,20,30,3,-18,-11,-19,31,26,29,12,24,-2,11,36,8,-14,6,22,-11,17,8,6,14,-2,-1,14,37,5,18,11,23,20,11,28,10,35,17,17,14,20,32,31,24,10,31,-6,14,18,-1,20,12,25,11,13,15,-10,-16,12,-39,-28,-18,-2,-18,1,-5,-7,-4,-11,-16,-3,-16,-15,-12,-9,-25,5,15,-11,-8,1,-26,-19,-15,-25,-28,-26,-36,-5,-17,7,5,7,6,23,31,-4,29,29,6,7,14,9,14,29,35,15,-18,34,-23,-7,1,-16,-26,-19,-25,-19,-16,36,5,6,17,6,-5,-11,30,10,4,-20,-2,-2,5,4,20,25,-10,-28,-21,-26,-29,-10,-20,7,-1,2,-5,-19,-7,-5,17,15,-15,-28,-23,-22,-12,13,-6,9,37,30,33,11,0,-5,13,15,36,27,26,19,14,20,18,4,17,-3,14,-9,-1,-31,7,33,35,17,36,30,29,-22,-30,-22,-15,41,34,-8,8,29,39,7,-1,-33,-30,-30,-5,25,-14,-6,15,-5,33,28,31,16,21,-4,-13,-10,-11,-20,-27,-8,-13,-34,-16,2,4,11,-20,-20,-21,-17,32,21,-1,31,-23,-34,-12,-13,3,8,-5,0,-12,20,6,-14,3,13,18,-8,-2,-30,-18,9,4,-3,-1,-9,16,18,7,17,13,12,-2,16,26,29,33,16,-2,3,19,33,32,6,28,36,35,12,1,18,15,18,34,19,19,2,30,3,15,10,11,26,30,20,22,27,31,30,28,31,9,-9,10,10,23,13,20,21,35,11,-3,-5,-8,19,8,-5,6,31,36,25,14,11,-3,39,41,34,41,34,43,39,41,18,24,25,24,30,30,30,30,37,21,24,27,23,19,14,31,1,12,27,12,3,14,16,30,17,21,6,14,24,8,25,28,13,23,3,2,-21,16,38,33,22,18,-5,28,0,10,18,4,10,5,10,20,7,5,0,-12,0,11,11,28,20,22,18,15,22,13,19,0,-18,-22,10,37,15,31,11,-9,34,17,5,32,18,15,-4,13,0,-14,-6,3,8,15,0,23,18,2,8,15,9,12,30,29,-21,23,25,27,22,-7,13,17,14,8,9,25,37,15,2,6,30,0,7,3,-5,-1,7,2,-34,26,-13,-1,3,3,23,19,2,28,15,18,25,28,7,-9,16,20,6,17,0,14,-22,-25,4,2,-31,-2,11,10,27,18,13,2,5,11,27,-5,6,-19,1,-6,27,39,40,24,21,39,20,7,13,8,5,14,-21,1,-6,25,25,35,25,33,24,11,-4,11,-9,7,-14,7,-2,16,17,31,36,13,37,44,33,40,41,40,-1,0,-1,-1,40,43,43,42,44,43,43,43,43,44,36,17,8,6,17,17,24,32,33,4,7,-10,21,19,4,3,32,-6,-2,1,-12,-24,-14,5,10,16,15,15,21,36,36,37,36,35,30,29,36,39,36,23,32,21,31,20,43,43,43,43,42,42,40,43,43,43,43,41,22,37,36,37,38,36,-21,-33,35,-15,15,0,-14,-22,-22,5,8,0,12,3,6,14,33,12,30,25,12,14,20,33,38,32,30,35,19,12,-21,-11,11,37,24,19,17,4,5,33,2,14,24,22,28,-10,35,23,24,8,21,14,12,11,28,17,24,13,40,16,19,38,28,-4,9,20,-9,8,30,26,14,23,30,19,14,13,7,12,19,22,33,13,9,21,9,13,13,14,27,15,2,12,29,3,4,6,12,28,8,27,32,32,35,34,25,22,22,38,17,39,21,35,35,23,22,21,22,30,34,19,19,24,40,34,31,30,10,28,31,34,25,27,5,25,26,13,23,28,19,29,30,38,23,0,32,27,19,21,30,7,26,27,9,33,-1,28,21,7,17,9,10,25,26,15,33,23,-8,-4,30,20,34,35,37,8,30,36,41,17,35,30,41,39,29,20,29,26,28,24,30,20,15,28,32,32,27,24,28,34,24,33,25,26,35,28,22,19,36,28,31,24,28,24,32,34,28,27,32,37,12,34,35,25,37,32,29,30,24,20,12,17,-8,18,7,17,-6,-7,-10,3,-27,16,-2,20,-23,-4,13,11,10,-10,-24,-16,-19,-16,4,25,31,-6,-13,-6,-13,-3,22,18,25,9,-9,28,31,11,6,4,-15,18,39,22,34,29,38,34,30,33,6,14,24,40,41,41,33,33,15,34,39,30,41,31,14,38,30,26,33,24,22,13,30,-41,-2,-16,28,5,14,30,29,19,32,27,31,38,15,11,8,-7,18,28,20,23,22,11,29,24,27,7,17,24,-1,31,27,28,28,20,15,6,7,-10,4,13,28,28,20,32,12,14,2,-2,-23,10,7,40,23,29,26,20,34,39,31,-7,-7,-8,14,12,30,28,-1,-11,7,22,39,19,10,40,12,16,31,35,15,-8,3,41,19,25,30,33,18,29,24,17,13,35,26,18,28,27,20,3,3,29,12,12,17,28,26,21,5,4,30,-3,27,32,18,21,21,27,9,11,13,-5,12,9,23,7,26,25,26,-2,-24,-2,-20,24,-3,19,4,26,27,14,-11,-7,-2,23,30,39,39,36,30,33,24,22,35,-21,16,29,26,17,5,15,24,22,25,33,29,20,29,18,22,24,21,32,29,39,34,38,21,14,21,33,34,32,36,21,27,17,9,-9,16,27,11,7,27,19,0,13,30,24,22,3,17,30,21,14,27,24,6,10,22,38,37,38,36,37,42,36,32,42,38,39,35,32,40,36,22,32,38,23,42,40,18,41,29,21,35,38,36,39,41,36,42,41,33,38,39,40,41,42,40,38,28,37,41,39,34,26,26,33,37,20,15,17,32,22,34,38,37,40,36,38,33,38,42,40,39,29,40,32,27,5,36,34,29,14,36,24,39,31,34,40,41,40,40,40,34,37,16,-24,17,30,10,18,18,34,39,34,30,34,36,39,22,10,25,19,38,35,28,38,42,37,16,36,36,18,35,4,32,35,20,27,37,36,41,9,16,20,34,32,31,19,29,18,29,37,34,15,30,20,32,37,1,3,25,29,42,21,21,27,36,40,32,8,26,32,31,21,15,25,41,33,24,32,13,4,12,18,-14,-8,-23,4,27,3,28,9,-10,-6,-16,-17,-1,36,27,37,28,31,35,39,13,8,1,18,30,17,25,33,17,36,20,-14,29,27,19,-7,22,-16,11,-5,-5,20,10,-5,-7,19,21,25,21,18,29,-7,25,0,12,9,12,35,41,35,41,23,17,35,28,14,22,40,41,39,35,27,23,27,28,37,19,34,36,37,28,36,41,29,32,28,24,13,-4,26,34,37,38,37,10,39,40,33,36,40,42,38,37,37,39,41,38,33,33,37,31,38,34,32,39,35,18,10,20,12,36,29,22,5,20,27,31,24,-2,-11,40,40,42,33,21,31,31,35,28,31,37,23,20,15,22,21,8,19,21,9,29,12,33,35,38,36,-4,15,31,10,10,14,32,26,18,17,24,15,40,28,28,35,40,39,39,31,36,38,36,34,31,20,24,36,32,35,34,28,11,10,27,33,29,26,27,16,26,36,27,13,5,16,31,30,35,34,36,39,26,9,8,26,30,23,14,21,3,15,23,20,25,23,35,34,39,25,33,27,8,21,35,40,38,36,37,40,42,39,40,40,32,39,35,37,38,31,-14,4,24,22,7,10,30,40,31,34,34,28,23,22,-3,-1,-28,-24,3,-13,7,-11,0,8,4,2,18,-13,-4,-13,-8,-3,-8,5,5,5,9,-1,-14,24,30,37,32,33,36,39,40,40,38,37,40,34,40,27,27,32,12,9,-5,-1,6,-3,5,6,18,20,28,26,6,5,-18,-22,-12,-21,-31,-12,-13,19,16,18,28,24,31,28,27,38,41,41,34,40,41,36,29,41,37,35,11,0,28,11,-24,-8,-4,22,24,31,19,16,17,13,9,3,7,19,10,7,16,21,2,-20,4,-12,-4,17,-21,31,40,31,15,30,33,25,15,30,30,25,7,-9,12,-23,-3,17,24,33,36,15,14,35,30,15,11,37,2,1,14,32,32,13,8,16,18,28,41,32,29,26,34,41,26,22,22,40,39,23,38,37,30,38,33,27,25,32,37,34,37,39,27,38,31,36,39,36,30,27,15,31,24,14,5,17,16,23,28,33,31,13,22,26,15,13,10,4,17,25,12,22,26,8,10,26,32,31,28,36,39,35,-6,2,26,10,23,26,31,37,41,41,34,34,22,20,-1,31,4,29,17,-6,11,35,30,17,29,22,34,29,25,9,16,0,23,38,32,10,12,31,26,29,12,9,1,-17,-18,18,33,38,36,19,-19,-11,18,5,34,13,36,30,-27,13,6,22,6,-5,25,37,34,34,9,39,41,23,38,25,36,23,24,35,38,-10,0,42,30,1,6,34,33,18,19,8,23,38,41,41,35,36,38,24,27,35,30,35,41,39,33,35,24,22,21,29,8,4,-15,17,20,13,13,6,28,30,32,22,24,24,37,18,35,6,20,32,29,24,30,21,13,8,-5,6,5,25,-31,-14,19,-3,12,8,16,33,26,6,5,16,19,13,22,20,30,30,37,16,22,6,-2,-26,-9,21,34,-25,-13,35,29,35,25,35,37,25,33,36,39,41,39,38,40,25,37,37,39,28,37,37,38,41,38,35,31,33,37,35,24,1,5,4,12,-3,36,39,17,-2,-2,8,16,4,0,18,25,33,21,18,27,24,29,-9,23,18,-3,11,20,26,20,33,39,39,40,36,42,38,38,40,42,41,42,41,41,38,39,35,33,35,33,35,36,36,31,26,32,1,-22,0,35,18,-4,-14,-29,-24,-28,-18,-19,9,38,29,25,32,10,31,18,-30,-30,-26,-28,12,3,26,34,29,35,25,-7,-11,-18,-16,-23,-6,-18,-11,20,19,-14,-7,-21,-31,20,31,18,25,15,4,7,19,10,29,28,16,31,14,33,13,18,24,31,25,30,23,-12,-9,-23,-1,-3,-4,-12,4,2,-6,-3,4,4,15,21,29,25,29,19,-4,-10,14,0,3,-19,-1,-11,22,20,6,33,33,7,10,-4,24,31,29,20,14,18,36,33,36,37,40,39,37,39,40,38,39,40,37,40,39,38,37,36,38,40,40,30,36,26,32,26,14,13,28,14,26,5,32,31,30,36,34,28,4,35,36,32,5,23,35,29,12,36,39,36,38,40,33,12,14,3,4,2,-15,-32,-24,18,30,-14,36,27,31,36,20,14,25,23,35,22,29,38,30,29,32,24,28,26,33,42,39,42,38,5,-25,16,30,8,25,23,35,35,31,36,28,17,3,-13,1,18,38,40,37,31,17,23,39,23,33,38,36,26,33,27,24,30,33,31,33,29,30,38,3,-11,29,40,33,31,34,37,34,20,6,19,-4,22,7,34,38,-15,-10,-3,-16,-12,27,34,37,32,22,13,22,26,22,38,24,33,38,12,-41,13,-25,17,12,18,23,5,40,32,20,30,26,18,11,29,39,41,28,24,26,23,39,17,5,-3,35,-18,25,19,36,35,-24,1,18,16,-12,24,13,30,24,1,13,12,31,38,36,20,37,6,41,39,14,26,22,12,12,37,16,20,32,38,35,1,19,13,26,21,16,-7,25,-17,-2,12,19,16,-29,-33,-8,-24,-20,-26,8,-13,-14,-16,9,28,21,1,31,19,21,22,25,26,-13,9,13,20,27,36,9,25,4,15,13,16,25,38,3,34,41,38,1,-8,12,29,12,19,36,32,26,29,15,-3,25,8,30,3,35,27,33,-7,9,38,20,35,41,28,38,24,38,29,32,34,31,14,24,26,15,-18,0,34,38,30,37,32,33,30,39,35,41,31,20,37,19,10,16,38,33,20,29,19,36,34,40,31,36,29,25,16,38,16,19,15,28,29,18,8,-10,9,19,5,-8,21,1,24,14,18,17,9,25,27,27,17,17,24,34,30,5,2,-2,13,-7,35,25,3,18,15,30,-3,23,32,32,20,16,14,16,38,-5,27,24,25,0,10,33,10,30,36,32,14,22,31,19,21,35,26,26,38,32,39,37,29,23,23,30,32,35,37,35,31,34,22,26,18,38,35,38,38,36,33,36,28,2,7,-6,8,31,22,32,31,37,33,35,33,40,18,24,32,26,33,9,11,32,26,35,20,28,0,21,40,21,27,0,9,-4,24,42,38,38,31,32,21,40,39,40,39,42,36,41,37,39,38,7,38,9,10,8,-12,-18,-14,-4,33,23,20,34,25,0,36,35,29,23,21,26,21,34,23,32,40,31,37,29,16,33,28,27,33,26,10,28,19,22,36,32,22,6,35,33,32,31,14,20,39,39,28,-2,32,39,33,35,37,32,39,28,28,12,32,31,17,13,23,16,29,34,21,13,2,29,34,0,-15,22,20,39,36,35,16,-14,36,40,21,38,27,21,24,40,35,37,4,17,21,12,14,36,26,15,9,11,31,-9,18,1,32,34,11,9,-3,15,31,16,23,36,29,-11,-14,-30,-30,-1,-7,-8,-17,42,27,16,23,6,31,23,30,40,34,16,17,31,21,39,34,26,4,-3,-14,12,18,5,8,5,-12,-3,31,40,29,39,38,34,39,40,36,34,33,21,25,22,10,27,31,-2,2,29,16,11,22,26,-3,0,0,26,27,6,29,10,18,40,23,24,41,37,25,18,19,26,7,32,36,22,4,-30,9,26,22,41,12,0,1,-20,14,-4,-17,-20,-30,-17,2,2,20,18,6,7,37,-5,12,25,40,41,26,25,3,36,18,10,-23,21,32,20,32,21,26,20,25,4,23,33,18,20,30,21,33,28,0,22,40,37,14,16,21,19,40,42,37,29,16,13,35,34,8,-15,19,39,19,23,13,31,18,19,-22,4,3,20,25,17,20,20,5,-1,-7,9,21,-15,14,15,-35,-30,5,12,-17,36,16,35,36,32,32,25,-10,-15,32,35,28,21,9,0,24,-2,9,12,13,41,28,7,37,40,35,30,13,0,25,36,32,36,-15,-18,-15,-22,16,-7,4,30,5,-7,-16,-11,-17,-18,2,-27,-34,0,-16,-17,-12,-15,15,-9,20,28,34,7,14,31,8,11,36,23,-9,4,15,7,11,16,-22,24,17,11,25,25,30,-4,-7,16,8,25,32,-7,2,-3,-8,33,28,16,4,19,17,14,-33,-26,-9,-26,-36,-9,-15,-30,22,30,27,-12,18,32,-3,33,31,15,0,18,37,38,30,42,41,32,39,-1,21,27,35,25,-19,-9,21,32,33,35,11,11,26,16,30,30,38,34,29,40,21,28,9,-11,33,1,6,22,19,36,41,39,40,40,39,-10,14,27,21,37,26,34,41,26,21,30,-10,12,26,26,8,10,21,22,16,7,9,2,-12,23,-19,21,2,32,7,-33,39,27,15,33,21,22,16,6,16,16,15,9,15,8,-13,8,20,18,8,-15,16,22,-29,-12,31,30,15,28,21,29,28,13,17,17,22,3,-17,10,9,5,-8,4,-1,2,-1,3,16,7,-5,3,11,4,1,11,14,12,26,11,15,39,38,19,2,6,17,17,31,38,39,34,36,40,35,34,25,33,38,40,18,34,37,39,38,19,21,31,31,24,39,37,41,39,37,34,41,5,4,2,-28,-20,9,30,5,26,16,38,40,38,39,29,18,29,37,28,35,19,-8,10,38,-26,-19,-2,-1,-15,-1,-1,32,27,26,27,30,34,-6,4,-5,-13,-9,17,39,19,33,12,10,31,29,18,27,26,25,12,-12,10,32,8,0,0,18,-12,-6,12,36,38,36,34,30,41,21,37,42,40,39,27,37,27,29,19,30,33,40,31,18,17,14,41,34,34,42,38,37,43,34,39,27,-24,19,-6,22,32,38,29,31,39,31,18,33,38,39,29,37,39,20,25,24,36,28,26,38,31,32,32,28,27,29,33,21,25,14,2,12,15,12,26,35,31,22,22,36,31,33,22,4,12,20,4,19,25,34,38,40,37,40,39,25,35,41,40,41,40,39,41,43,39,30,34,28,21,16,20,19,4,3,18,-2,8,-14,14,2,-9,16,17,13,19,31,35,30,41,39,37,36,41,41,24,40,29,37,32,14,20,34,34,35,33,32,43,35,40,35,37,30,23,34,31,16,-10,-15,32,33,41,29,5,18,29,34,19,29,24,32,36,29,31,39,42,41,14,20,35,17,34,38,40,38,39,39,27,17,12,-4,-36,12,37,36,39,33,34,37,40,38,38,38,38,42,38,38,28,39,39,39,41,40,41,36,37,19,38,33,30,33,31,37,33,28,35,29,38,36,34,40,34,40,40,37,40,29,-24,25,8,24,22,15,8,-26,-7,13,25,13,-16,10,17,34,35,13,26,20,-23,-23,-33,-16,36,19,39,42,39,18,37,38,29,24,23,12,-32,18,34,9,2,40,31,38,36,41,41,41,12,38,27,38,25,36,14,10,-30,-31,13,8,-10,-18,13,19,40,30,24,2,13,4,12,1,-35,-30,-21,-3,-2,24,19,9,39,15,-2,23,-20,25,-13,-15,30,30,-11,5,17,13,17,36,10,15,39,7,12,17,25,-7,-32,34,41,33,19,20,35,36,30,23,29,35,39,39,31,34,32,16,13,27,33,29,24,26,7,37,33,33,18,39,32,40,37,26,38,17,35,37,30,33,37,28,14,5,7,-7,16,2,-24,-2,26,34,33,-18,-30,15,-18,31,10,-6,-6,0,-32,-21,-1,15,15,18,4,1,-5,-25,-21,15,-10,-27,-24,-36,-5,-34,-19,10,4,6,-5,-19,2,10,-12,-27,-39,-11,-12,-30,-26,-35,-34,29,5,1,-21,-24,-29,-34,-18,-3,-16,4,32,-15,-22,-26,-11,-18,-15,-10,-1,37,38,33,1,-30,-25,-32,-22,-25,-10,10,-32,14,31,9,5,-12,-23,15,-10,-2,12,-18,7,1,15,-11,-3,7,-36,-5,-21,-13,-8,-27,8,32,25,13,33,26,-19,38,22,37,11,20,-3,-10,-7,17,7,6,-29,-19,25,1,17,38,28,25,24,8,-5,-37,-7,4,1,11,13,-6,2,-21,12,8,33,34,-35,23,28,18,22,-3,-17,-10,-4,-39,-22,-34,-24,-5,13,-5,23,28,21,37,22,19,13,28,10,-12,-4,12,33,15,5,-33,-22,24,25,21,-6,-17,-4,26,-25,-22,16,15,23,-12,-21,-13,-16,12,39,-5,-5,-3,5,1,6,-13,11,20,2,5,-7,15,28,36,27,23,37,10,21,6,33,30,-12,38,38,-28,5,10,15,22,31,35,40,30,21,-21,-29,30,21,-3,4,-17,-36,-30,-19,-35,-31,-24,-28,-25,-7,2,-22,0,13,13,9,-3,1,0,-3,-19,-4,42,38,22,32,19,20,26,16,31,40,34,38,42,37,40,31,39,42,41,40,41,40,19,24,38,39,35,33,35,14,10,13,15,11,41,41,32,28,34,39,41,21,-12,18,34,39,37,38,25,10,-1,3,18,35,11,39,42,28,24,19,4,-17,-18,-36,-35,-37,-6,-9,-23,-23,-31,-24,-15,-28,-17,-21,-19,-8,-14,-15,-27,8,8,29,25,-13,6,27,26,-8,-32,-33,-21,-38,-18,-31,-35,-31,-27,-34,-41,-33,-30,-41,-20,25,35,21,-23,-33,-33,-28,-31,-15,-37,-24,31,36,33,36,-31,-39,-2,-20,8,-3,-35,-12,-27,-30,-26,-42,-39,-40,-39,-30,-32,-34,-35,-30,0,-31,7,11,11,11,-10,-24,-38,-25,-29,-3,-12,-36,0,-26,-37,-30,-25,-12,24,5,31,8,9,-3,5,-24,-42,-19,-15,1,6,-18,34,34,23,21,38,38,-37,-8,29,-24,-3,31,31,37,24,20,34,10,29,28,34,12,20,-7,-4,-10,39,17,37,34,34,19,18,39,28,42,41,36,35,36,33,38,36,30,37,34,28,20,31,8,37,41,26,28,40,20,16,29,23,21,30,29,21,21,31,28,29,39,14,37,14,25,38,34,31,10,19,37,33,18,4,39,39,14,9,0,-5,-28,-5,16,38,35,27,40,38,35,42,32,28,41,22,33,29,40,34,13,12,38,29,36,14,5,24,31,27,30,31,1,26,41,16,18,-4,0,-1,23,4,27,24,33,33,-2,-16,27,39,13,38,41,42,25,27,17,25,23,16,19,17,-13,10,5,-17,26,19,16,27,19,21,31,30,30,21,25,28,33,30,19,28,38,18,16,24,37,37,38,27,22,37,31,30,38,26,33,30,36,40,33,40,39,41,35,22,35,14,36,13,20,33,40,39,41,-7,25,27,20,33,-11,20,40,-11,33,-4,40,-11,3,30,22,20,40,21,39,30,23,34,30,38,31,30,37,34,34,40,32,32,35,37,38,38,32,40,34,25,36,33,29,22,22,28,41,37,29,43,43,42,33,-13,-41,-35,-27,0,34,39,15,-1,-1,25,28,21,21,6,-9,27,13,14,12,16,6,15,9,15,24,24,32,26,18,36,19,33,25,31,35,26,14,25,38,41,40,36,29,19,24,7,23,25,19,13,25,35,29,13,17,-21,-19,-19,37,37,34,5,-11,-4,-20,-11,23,-7,-13,-15,10,32,27,23,20,8,11,24,24,-10,-13,11,-12,-3,-8,2,-12,-1,-23,8,-1,-25,-35,-37,-40,-28,-8,-4,18,26,3,-9,-17,16,32,42,41,38,39,28,29,30,27,32,-15,-32,25,36,30,34,36,32,32,28,27,26,-13,18,34,41,18,10,18,18,4,34,39,15,34,-2,-14,19,15,38,40,32,7,8,15,40,39,28,23,40,41,38,-21,-41,-25,-3,6,6,5,-13,-13,-15,-22,0,16,32,28,26,26,8,10,27,22,-14,10,19,27,33,-11,9,33,29,2,12,-30,-40,0,-8,-20,28,23,-6,-30,-17,8,-29,-12,2,-13,-25,10,29,19,24,24,-1,-11,19,6,-6,-6,-1,-15,-18,-16,-11,-33,-41,-43,8,9,-3,4,-26,-37,-30,-33,-35,-38,-23,-37,-34,1,17,30,5,20,20,0,-8,11,10,6,7,21,34,36,5,24,29,14,37,25,19,11,35,39,37,39,35,37,31,32,29,33,37,21,24,35,33,41,30,37,37,32,26,39,14,-21,-26,-27,8,41,30,33,32,37,23,20,-7,-6,15,-22,11,18,18,30,-2,13,39,25,32,20,20,34,16,30,19,24,33,21,27,25,-7,-6,0,1,-2,3,-5,25,28,34,37,35,15,16,26,28,36,21,8,-14,15,30,8,7,23,31,23,-11,1,8,32,38,28,42,40,29,23,29,2,20,30,29,27,27,42,23,34,38,42,25,34,31,40,33,11,31,37,36,40,35,6,-15,-7,-1,31,37,20,14,31,24,34,25,25,34,30,28,31,30,21,19,26,30,29,24,29,27,26,26,18,32,29,35,27,33,32,38,28,18,27,16,12,29,28,25,32,27,36,15,34,35,31,30,37,35,37,38,39,41,13,16,28,22,22,38,26,23,-4,-24,31,26,29,37,39,40,36,41,40,39,42,36,29,32,33,40,40,38,39,37,10,37,31,18,31,22,26,25,39,39,30,40,40,33,39,29,38,18,38,35,20,17,11,20,35,32,23,31,-34,17,28,34,32,17,32,34,22,5,8,23,27,41,40,32,34,36,36,28,31,33,35,42,33,38,35,22,35,30,38,36,40,37,36,24,41,42,31,35,-3,23,40,25,38,38,38,35,36,37,40,35,24,21,37,38,38,23,32,33,34,38,41,42,40,26,29,39,32,26,38,25,27,29,27,27,-2,23,32,39,3,16,27,10,23,29,40,29,35,31,21,35,36,32,26,7,27,32,42,23,35,36,33,38,40,11,39,32,22,36,11,11,-3,19,24,23,8,32,40,3,16,29,-12,4,-14,-21,-23,-7,-31,-3,37,40,34,35,18,21,31,36,34,4,23,30,38,36,28,30,31,31,36,40,42,40,28,34,36,40,38,33,37,38,33,40,41,40,34,27,32,41,39,34,38,20,-2,30,24,19,38,33,38,15,35,37,-1,24,-12,-13,14,39,41,41,26,34,36,29,36,27,32,27,28,31,34,25,29,29,16,21,29,17,-4,31,2,-41,-11,27,36,31,25,22,39,23,24,4,41,17,42,43,40,43,40,33,30,25,27,33,33,32,23,31,31,27,41,39,13,9,32,40,24,17,35,40,39,41,37,37,36,37,16,15,34,27,26,16,18,32,11,12,22,18,31,35,21,26,34,38,35,27,25,18,18,18,22,14,16,19,23,37,14,31,24,19,35,25,-2,-3,-6,31,17,30,38,40,39,36,31,14,28,31,34,33,22,32,38,34,40,29,19,15,26,23,34,34,37,11,-4,16,38,37,34,35,19,17,36,40,41,32,29,12,27,7,3,25,27,26,27,36,-3,1,20,38,20,24,17,5,8,11,11,8,8,18,12,-2,-20,-11,-7,9,-15,-4,31,31,31,38,29,32,8,11,4,27,41,36,35,24,18,27,35,34,34,32,23,16,22,41,39,27,41,37,24,18,41,38,39,38,38,36,38,38,34,36,32,33,14,35,19,22,20,35,36,39,30,29,38,26,36,31,37,32,36,37,36,34,34,39,40,37,36,38,39,37,34,37,39,26,37,35,22,35,18,29,11,21,22,30,27,18,28,22,26,31,31,35,36,36,11,19,33,31,31,32,24,18,29,39,36,39,18,29,9,10,13,36,38,26,18,4,14,20,29,38,27,24,25,34,39,36,29,27,31,31,13,-13,-2,-13,-5,27,27,21,-19,17,12,-9,33,35,23,28,39,34,41,25,37,39,29,29,17,36,-15,25,14,19,34,39,24,-5,18,18,39,42,43,43,42,40,35,15,20,16,37,26,1,26,26,36,25,37,38,32,31,30,24,35,34,12,31,29,31,38,27,35,29,20,32,31,30,38,39,35,23,38,37,25,26,26,34,22,-6,-6,18,0,6,24,34,34,41,41,34,21,31,-9,33,40,24,40,30,40,30,39,32,26,-1,19,27,36,5,-10,17,13,4,28,30,25,17,35,34,31,35,36,42,31,31,24,35,33,21,17,5,10,18,8,24,15,34,37,30,6,35,30,28,33,35,37,33,30,32,34,12,16,33,32,39,29,31,33,41,39,39,34,35,33,27,42,40,32,31,29,35,20,32,23,4,9,34,28,-9,34,41,39,38,18,14,29,27,35,38,37,31,41,9,27,17,36,37,31,12,4,23,30,26,8,32,39,24,35,21,31,26,33,28,18,38,22,42,39,42,43,37,37,38,33,36,23,40,35,42,24,16,39,37,37,30,-3,17,3,37,36,41,37,26,35,27,7,-12,24,33,13,-8,33,31,-28,38,25,27,32,5,23,17,31,40,30,31,24,15,19,10,36,33,24,16,18,14,27,16,7,9,28,37,35,11,8,4,32,0,-2,24,34,30,30,35,37,39,38,38,26,19,25,15,27,25,26,21,5,29,20,24,35,41,38,31,-15,40,39,36,36,35,20,3,2,19,23,39,37,36,40,41,30,31,38,38,22,22,10,30,40,41,16,-18,37,42,41,40,36,-6,31,35,33,32,27,37,21,-14,38,42,41,33,34,40,39,34,33,32,29,34,37,33,0,13,24,32,26,28,29,35,39,32,30,18,36,31,15,24,26,29,38,38,39,40,41,41,42,34,35,40,40,41,36,28,38,42,33,39,27,40,40,6,32,35,36,25,23,38,10,9,37,22,31,32,21,19,30,11,33,35,36,35,36,16,7,13,34,34,25,38,42,38,42,41,39,39,42,42,41,36,40,39,25,10,16,18,10,20,25,35,34,34,18,17,-32,34,39,32,42,42,41,36,33,41,40,40,40,34,37,23,19,22,39,40,37,33,34,33,38,8,34,25,23,35,33,37,15,-5,12,19,9,3,8,17,23,-11,2,5,14,5,3,-1,34,31,20,24,13,33,27,22,6,12,-14,37,2,19,17,6,22,28,28,27,25,20,22,13,28,17,32,16,6,-5,17,11,5,21,32,30,20,16,11,18,27,15,38,36,36,30,25,37,30,34,41,31,9,28,28,32,8,34,15,14,20,8,30,40,39,1,23,40,41,40,3,32,34,42,31,26,32,41,33,38,31,24,41,38,41,42,27,-6,12,12,15,34,39,39,40,35,11,-13,27,36,16,-17,6,-20,27,39,22,32,37,29,33,32,31,36,35,41,37,38,35,37,39,37,31,39,33,16,16,26,19,17,34,-5,-12,38,32,-3,-13,-17,-14,-15,20,-7,-25,-32,-30,3,-9,-4,-6,3,25,1,9,-25,-33,-25,0,-9,12,18,36,37,17,24,10,-12,9,-2,-15,-32,5,11,6,21,2,38,25,33,28,9,27,37,37,36,33,16,29,-7,23,38,33,18,32,37,35,30,24,29,25,17,-18,-2,31,37,13,18,35,1,8,12,29,25,27,32,20,28,2,-5,-4,30,30,16,32,36,26,13,22,32,19,33,0,-20,7,-3,-5,0,33,10,28,31,15,9,17,13,-2,16,10,-19,25,16,-10,-5,-12,-23,20,13,-4,26,34,27,10,3,0,29,-11,-16,-7,-8,-13,-2,9,-20,8,-32,5,38,-23,20,9,35,30,-15,14,33,-10,6,-1,-10,3,21,12,15,20,24,26,19,13,21,10,24,35,37,39,36,10,32,33,40,31,14,13,25,22,37,32,20,-3,13,38,39,31,36,36,31,41,18,40,39,35,28,36,30,37,39,31,20,-1,33,40,37,26,29,21,33,23,28,29,38,38,38,30,31,18,38,36,37,38,37,35,33,36,39,42,23,25,41,36,17,37,38,40,40,39,34,35,26,32,31,21,18,27,19,33,29,30,40,37,34,19,11,27,17,-15,-7,-25,-36,8,33,20,17,10,34,32,26,-6,4,-14,-10,-10,-8,-11,18,-2,-6,13,1,9,3,39,34,33,39,38,41,39,26,26,39,36,37,30,39,20,-1,-14,-20,-19,-19,33,22,5,14,5,-8,-10,-31,-11,0,23,30,34,30,27,32,38,26,30,22,19,25,31,34,35,27,11,27,26,31,21,32,29,31,21,10,15,20,11,18,39,32,36,33,29,28,35,31,29,32,34,37,34,35,6,5,31,39,41,40,36,38,32,37,41,41,41,40,30,21,33,27,27,35,24,30,36,23,31,31,-8,23,36,34,18,-1,13,12,21,-11,-31,-18,-26,-31,7,25,-7,29,23,15,26,33,18,26,31,1,-7,28,37,29,23,28,26,41,42,42,38,30,40,38,15,-23,1,38,37,40,42,40,40,33,40,32,23,1,-37,8,-13,12,21,36,39,41,26,26,35,32,17,33,38,37,33,39,40,31,21,-14,-5,-19,11,1,4,-7,-4,2,34,30,27,29,21,33,32,31,30,31,13,28,14,-2,14,-3,20,31,36,-4,0,41,37,24,37,42,35,35,19,28,15,19,20,17,24,27,31,35,18,-7,29,12,38,32,17,18,22,26,-3,8,1,33,36,39,32,37,41,29,32,39,37,32,25,6,14,21,32,29,27,27,25,23,17,6,14,28,27,29,32,23,28,35,27,36,27,40,39,38,35,7,20,-19,6,11,12,31,15,17,5,11,-30,-23,31,-1,33,41,39,40,22,32,31,19,29,41,34,34,34,22,38,36,35,30,27,41,34,37,30,33,22,20,27,10,14,14,27,27,29,17,0,25,38,37,31,27,35,18,26,19,11,23,23,31,23,26,5,10,26,41,2,13,6,14,8,38,27,19,39,39,37,39,40,35,36,21,31,39,30,29,40,23,17,21,22,26,34,21,-13,29,38,36,33,29,37,20,34,38,40,39,35,33,23,34,29,30,34,36,17,39,38,31,27,41,28,29,17,27,25,37,33,35,28,30,28,23,22,25,39,35,23,33,-5,6,37,27,14,15,19,19,-13,-14,5,-3,-23,-12,-21,18,8,9,-25,25,9,18,32,40,15,30,37,39,39,19,28,37,41,39,10,23,29,39,40,31,22,19,18,31,20,23,34,14,25,9,-22,-2,14,15,22,16,19,15,37,40,19,18,29,31,10,27,-2,20,40,26,37,33,19,24,33,37,38,19,37,12,10,19,29,17,13,-3,-34,-9,13,34,17,6,-27,13,38,33,18,34,33,21,19,33,35,41,24,26,30,33,23,33,34,25,32,18,8,8,9,32,20,33,33,37,34,36,42,38,40,32,8,35,41,40,27,19,24,39,32,31,41,30,-12,14,-14,-11,41,39,-20,32,35,39,14,-42,-37,-24,11,4,35,40,21,31,28,39,24,23,38,16,6,6,-24,11,18,17,32,8,-4,28,31,13,11,-28,-25,-29,-34,-29,-39,-39,-3,10,-27,-15,-12,23,-10,-1,7,9,12,0,11,11,3,25,-8,-1,11,33,36,20,34,30,37,31,38,40,17,0,-36,-15,26,-8,7,-4,-27,38,0,37,4,-4,25,23,-22,-8,18,31,27,-11,-19,-10,24,-29,16,-9,13,37,19,18,5,7,9,-18,15,-28,5,-2,35,34,18,17,-24,-22,-17,-21,-24,-12,-23,-9,35,30,25,24,32,15,35,7,3,31,40,38,28,24,4,-8,8,29,17,36,0,-4,23,5,40,32,18,11,6,29,14,25,36,32,25,36,38,35,12,18,40,13,41,43,16,29,36,40,40,36,35,31,33,32,38,31,25,26,17,-4,-21,-3,23,30,39,41,-2,39,40,22,12,19,8,28,37,11,9,20,24,18,24,4,14,32,33,24,-3,-3,1,41,7,18,34,14,29,27,18,-3,13,32,24,35,5,-3,-7,-8,14,25,41,39,33,22,37,39,40,42,43,21,2,7,31,12,-11,14,38,16,20,16,22,30,26,-6,36,18,31,36,31,24,14,18,32,32,25,31,7,0,11,10,21,28,31,24,3,25,17,2,1,3,11,26,39,25,37,36,30,41,31,13,26,23,16,-2,7,32,28,39,20,26,22,21,10,34,41,30,-2,17,32,24,37,39,37,2,8,8,-14,33,25,19,6,-7,22,26,17,20,37,33,27,16,37,30,22,29,16,34,38,30,31,4,26,1,4,34,42,0,30,28,28,35,36,41,32,24,37,11,32,13,35,35,10,4,28,22,19,32,5,-3,14,4,27,38,31,40,40,36,12,25,30,37,25,31,19,33,38,39,35,33,31,33,36,32,32,20,-19,18,22,26,3,4,18,16,12,23,22,23,1,-1,33,14,23,12,32,14,11,20,-7,25,25,-4,15,35,21,-4,7,-4,-1,1,-11,1,7,2,5,9,25,20,-6,-28,-32,8,3,-3,7,11,10,7,7,-1,-20,-28,-31,-37,-32,-8,35,9,-8,11,10,19,1,1,-2,-7,3,0,14,21,8,2,38,24,14,28,19,10,3,22,33,30,36,24,18,9,5,31,24,26,29,-15,-22,-21,-18,-16,-12,-14,-21,-29,-32,-20,-20,-29,27,-23,-10,36,17,-2,-4,-6,-8,-9,-10,0,10,15,28,14,15,14,9,10,15,-5,8,25,23,5,30,36,30,21,27,16,16,38,41,30,17,18,17,35,25,-6,-2,11,36,29,25,33,21,37,36,36,39,39,37,38,39,39,36,34,34,39,38,26,40,39,39,31,36,35,35,29,29,29,28,24,23,15,28,30,23,19,25,9,23,26,19,10,12,17,8,16,20,29,33,28,33,34,34,41,22,36,36,38,39,33,27,33,24,21,36,40,29,29,23,26,10,7,25,18,5,-2,13,-12,-7,4,3,16,12,-7,8,13,-10,0,-2,6,8,5,24,12,34,38,39,40,40,40,31,35,27,5,6,7,36,36,35,41,29,36,39,32,31,29,27,20,39,34,10,-22,4,29,7,12,11,23,-1,37,34,15,21,-4,33,35,25,18,14,13,28,-26,-2,-9,31,21,-12,3,6,24,26,34,40,39,38,41,40,37,36,40,35,32,32,15,21,14,12,3,32,20,21,26,24,25,16,9,11,14,25,10,8,-2,11,-15,19,-5,-2,41,36,15,34,26,33,40,18,29,17,-2,-16,-28,13,8,30,39,31,38,39,39,42,29,-10,4,21,40,24,12,29,41,27,30,25,40,36,18,15,35,32,39,38,22,31,16,-8,13,18,35,33,41,39,31,19,41,34,4,14,24,39,36,33,36,13,33,5,14,27,20,25,13,37,39,27,41,10,-3,28,36,27,29,-8,30,2,34,35,28,3,26,14,41,39,40,35,38,20,31,38,32,22,18,33,27,2,-3,16,39,40,41,38,30,33,38,21,33,36,39,39,37,35,32,37,41,40,41,24],dlon:[-1164670,-1,3,-30,-5,-33,-43,-32,-20,-34,-37,-15,-25,-28,-22,-25,-24,-21,-4,-1,-8,-2,0,3,-29,-30,-23,-12,-4,-24,-30,-13,-15,-6,10,6,20,-6,-37,-28,-18,-42,-38,-38,-32,-32,8,39,15,-20,-3,20,26,28,19,27,14,19,39,46,20,7,-21,-30,46,29,15,29,50,46,29,27,13,11,-8,-14,-19,11,-11,13,19,3,21,49,43,7,33,28,28,23,21,36,8,17,14,20,45,28,37,37,26,31,9,11,-8,-6,2,5,12,-4,28,11,28,32,9,9,28,26,-21,-4,28,32,28,-4,-26,1,1,-24,1,15,-1,1,-7,0,14,41,6,3,-9,-21,-23,-37,4,-3,-41,-5,-17,-24,-33,-9,-36,-27,-33,-21,-25,-26,-18,-9,-27,19,12,-21,-19,-35,-17,-28,-41,-19,-13,-25,-35,-35,11,-10,-8,-14,-25,-24,-33,-24,-28,-6,-15,-16,-26,-13,7,-28,-30,-25,-21,-19,-18,-24,-5,-30,-16,-16,-12,-20,-22,-21,-21,-4,4,30,16,38,30,36,6,-12,15,25,28,-1,-41,9,-23,-2,-11,-6,-9,8,28,32,33,1,23,4,12,41,37,35,23,33,21,34,42,36,33,43,36,29,-7,-13,-11,-4,33,33,-35,-48,2,-4,-14,-27,16,13,-32,9,-35,-25,-16,6,-38,-3,9,-9,-5,-9,-27,1,-26,-32,-1,-5,-2,-21,-25,-31,-30,-3,3,-3,-24,12,-44,-33,-25,-19,-30,-21,-28,-43,-33,-28,-30,-15,9,11,-45,-24,-12,19,-14,8,-34,-28,-31,-11,-27,-25,-21,24,22,-7,-23,-29,-29,-19,-16,-6,30,34,-36,-31,-33,-19,-27,-30,-20,-41,4,35,-10,-35,-44,-23,5,-5,-6,5,-6,-14,-4,-42,-50,-43,-13,-24,-17,-30,-39,-44,-42,-38,-29,-29,-51,-44,-33,5,30,12,31,35,50,44,27,31,24,17,-37,18,-6,27,9,4,30,0,-7,-29,-12,-29,-32,-35,-9,10,10,-2,-17,34,-7,36,37,7,5,28,38,25,42,40,18,-7,9,-2,17,-2,35,11,26,14,22,25,10,-25,-27,8,-10,-16,-17,1,-25,-17,-15,0,-1,4,-20,5,19,-26,13,22,22,25,7,-34,-9,-17,-22,16,-6,8,0,26,19,22,35,17,25,21,29,3,29,40,28,34,0,9,27,10,12,8,-14,-16,13,-16,-29,-9,-28,-25,-25,-17,-26,-17,-23,-16,-10,-4,35,34,-7,0,2,4,21,29,11,11,31,-8,-23,-22,14,24,7,19,-16,13,24,-6,21,-7,7,-2,13,-15,7,-2,24,12,9,16,-3,-17,9,22,13,7,-37,-28,-6,-3,-4,33,-4,-37,-6,4,-16,-36,-28,-32,-29,-42,-45,-45,-27,-12,-14,26,-27,-37,-35,-14,-31,-23,-21,-20,-5,-9,-15,6,-36,-16,4,-28,-38,-31,-27,-10,-24,-17,9,-19,-21,20,-14,8,-7,1,32,3,-39,-46,-44,-44,-32,-26,-16,-21,8,-22,-12,13,-5,18,-19,6,-12,-24,-37,-38,-43,-34,-23,-25,-44,-28,-15,2,-32,10,1,38,41,4,8,8,-32,-9,0,-28,-29,-13,-22,-12,-17,-39,-41,-37,-46,-48,-35,0,-6,19,19,4,2,22,16,18,35,31,4,12,5,20,14,24,-4,12,13,0,19,32,-23,14,20,19,20,-7,23,35,19,-5,-14,32,-9,25,12,24,-7,-27,-38,-42,24,47,41,35,1,35,14,15,1,-11,-20,-28,-2,1,0,0,-2,-39,-35,-28,-14,-29,-28,31,43,13,23,47,49,49,49,45,22,7,-14,-23,-32,-23,-6,-11,4,41,-9,22,22,17,-21,25,-7,1,-22,-8,-15,-13,8,28,28,10,22,26,-13,33,39,-1,4,40,-16,-42,-37,-12,35,26,13,-40,-25,-44,-47,-33,-7,-5,-18,21,31,39,4,-29,-29,8,-13,-10,-12,-12,-22,-26,-9,1,-20,-35,-39,-21,-40,-32,-32,-37,-38,-26,-1,-43,-33,-35,-20,-39,-32,-41,-35,-45,-44,-35,-48,-19,-1,33,6,43,35,44,28,-1,-26,-17,-33,42,44,41,29,44,33,26,38,48,13,-31,3,-5,-6,35,1,10,11,10,-23,-20,12,-4,19,-1,-19,0,-32,-8,16,-4,-14,-4,-46,-21,-26,-18,-9,-14,-32,-41,-27,-23,-32,-26,-15,5,-9,19,13,-48,-20,-36,-39,-26,-27,-8,1,13,-20,11,-6,-35,-47,-10,-25,-44,-39,3,-20,-39,-26,-46,-17,-25,-9,-22,-41,-36,-41,-46,4,-25,-27,-17,-10,-10,-14,-24,-42,-8,-36,-27,3,-35,-33,-46,-36,-31,-46,-48,-40,-37,-10,-29,-47,-40,-14,-41,-32,-27,-47,19,-29,-42,-41,-30,-35,-36,-19,-35,-30,-31,-34,-2,-40,-21,-36,-20,-18,-6,-45,-16,-20,-37,-27,-39,7,-38,-46,-40,-33,-22,-24,-38,-29,-25,-38,-36,-45,-43,-42,-34,-21,-25,-35,-33,-12,-36,-39,-42,-23,-42,-46,-46,-39,-38,-37,-43,-34,-43,-33,-42,-38,-48,-44,-43,-28,-20,-22,-5,-14,2,-4,7,-5,21,18,-1,-39,-21,-37,-32,-10,-10,-6,-38,-18,2,-23,-34,-11,-37,-37,-25,19,-26,-42,-33,-36,-23,-25,-23,-38,-27,-28,-29,-23,-15,-42,-31,-42,-45,-45,-40,-33,-37,-9,-33,-33,-49,-36,-19,11,-42,9,16,-21,-23,-39,-18,-25,-29,-20,-19,-33,-14,12,-8,-34,-22,-13,-30,-31,-26,-36,-29,-29,-33,-39,-32,-33,-32,-39,-51,-44,-33,-8,-17,-29,1,21,13,-3,-30,-36,-41,-31,-24,-39,-45,-43,-49,-35,-18,-27,1,-28,15,-1,-18,-17,-18,-32,-3,-33,-34,-23,-34,-33,-39,-41,-20,14,-45,-9,-41,-42,-41,-41,-44,-7,-29,-39,-43,-19,-36,-24,-24,-42,-17,1,-37,5,-24,-14,7,-19,-24,-41,-13,-4,-36,-37,-23,-21,-38,-36,-40,-42,-27,-14,31,-18,-20,-21,-23,-2,19,-28,-42,-9,-20,-15,-25,-20,-48,-48,-28,-46,-21,-23,-43,-36,-23,-46,-30,-14,-48,-42,-41,-34,-11,-39,-29,-29,18,-45,-45,-22,-14,-23,-35,-22,-39,-30,-33,13,-45,-42,-30,-26,3,-41,-43,-45,-38,-43,-45,-20,-45,-17,-26,-45,-41,-31,-23,-27,-38,-37,-10,-45,-46,-37,-31,-44,-30,-17,-33,-38,-42,-36,-40,-44,-16,28,-13,-30,-9,-17,-10,-8,-14,-2,-7,-19,-13,16,-10,-8,-17,-47,-43,-35,-46,-26,-36,-45,-36,-23,-20,-35,-27,-45,-38,-44,-39,-14,-36,-22,-17,-42,-22,-24,-18,-40,-39,-18,-41,-7,3,-18,-8,-23,-25,-27,-16,-22,-18,-40,-16,-29,-33,-5,5,27,-1,-30,-35,-40,-28,-7,-42,-33,-49,-40,-46,-49,-25,-11,-33,-22,36,-12,-23,-23,-19,-35,-39,-48,-1,38,-48,-31,-41,-38,-44,-22,-32,-38,-29,-33,-36,-17,8,14,7,-27,-26,-30,-16,-4,0,5,-19,19,-38,-41,-35,-19,-31,-21,-23,-22,-37,-18,-19,-20,-7,-40,6,-24,-11,-22,-13,-41,-28,-8,-29,-23,-45,-31,-2,-15,-15,-17,9,-26,-32,-37,-18,-30,-19,-39,-28,3,-1,-33,-42,-31,-43,-46,-42,-42,-29,-35,-24,-21,-33,-40,-40,-42,-21,-22,3,-18,-23,-43,-24,-23,-40,8,-27,-40,-29,-8,-33,-41,-23,-33,-28,-11,-32,-47,-38,-32,-40,-24,-18,-40,-40,-44,-43,-36,-34,-10,-42,-33,-39,-19,-33,-40,-8,19,-16,29,24,25,12,-15,0,-10,-25,-16,-6,-17,-39,-13,-25,8,-18,-26,-39,-44,-1,-37,-39,33,30,19,-20,-18,26,25,3,-8,-29,-14,-13,-28,-31,-15,-18,-24,-26,2,7,-22,-38,-37,-33,-36,-40,-39,-13,36,19,-30,-40,-43,-52,-7,1,17,13,32,5,21,1,-36,39,22,3,25,18,13,-16,17,-12,-29,-22,-19,11,16,-18,-32,-33,-10,-42,50,37,28,-8,-28,-25,-50,-14,28,24,27,-10,-28,-32,-33,-28,-17,-17,-9,0,-32,-36,-22,-19,-45,17,30,-27,-38,-44,-33,-17,-25,-22,-17,-26,-22,-25,-23,30,31,16,-15,-30,4,-18,-21,-28,-22,-29,-36,13,24,-12,-31,-30,-9,-29,-42,-19,-22,-26,-32,-38,-46,-40,-36,-38,-31,-23,-28,-23,-25,-29,-20,-24,-26,-21,-14,-18,-20,0,-20,-13,-20,-29,-29,-34,-42,-41,-27,-36,-10,-23,-28,-29,-17,-42,-36,-31,-39,-14,-39,-42,-23,-15,-36,-42,-22,-46,2,-25,-49,-28,-30,-40,-37,-22,-39,-43,-24,-16,-43,-32,-24,-31,-17,-35,-34,-41,-11,-30,-44,-35,-15,-22,-30,-18,-31,-35,-33,-33,-32,-19,-30,-31,-16,3,-11,-40,-20,5,4,34,-13,7,8,3,39,45,48,6,14,0,-6,-5,16,31,33,27,28,31,29,35,41,20,42,-2,-14,11,14,0,5,-5,2,1,53,53,52,45,4,-1,-1,-1,-2,0,-1,-1,-1,0,9,48,47,48,48,47,42,33,27,51,50,49,45,44,52,52,21,52,47,52,48,40,49,52,52,49,49,49,45,29,29,29,28,-29,-33,40,10,-11,-25,-41,-13,-46,-26,-32,-1,-1,-1,-8,-13,-12,-11,-3,0,1,0,2,-14,10,5,5,17,7,35,14,11,26,17,26,10,32,8,27,21,27,-2,31,14,4,-3,1,27,0,-16,-20,41,29,-4,2,23,27,40,30,32,39,40,-2,11,3,8,36,45,21,25,39,18,26,14,28,21,11,35,30,-3,37,31,31,26,41,-12,45,3,34,32,-6,22,50,45,38,24,38,29,39,45,35,19,15,-5,-14,12,10,-18,20,26,50,52,38,51,51,50,46,41,40,44,5,-3,-30,-17,-18,-11,6,-37,-9,-12,8,-11,17,37,39,42,19,28,-10,-27,6,-10,24,29,42,-20,27,-23,22,4,28,11,19,28,22,38,22,-11,10,-38,-23,33,-9,0,-4,28,-27,-15,-30,-8,-5,-16,-34,-31,-11,-24,15,3,0,8,-1,-33,3,-17,32,-17,-9,-17,39,35,-5,-28,-29,-21,-30,-46,-46,-7,-29,-11,20,7,44,-26,-4,-13,34,2,-32,-5,-7,-27,-39,-30,-31,-20,27,-24,-43,-47,-26,10,-7,-33,15,25,16,2,-3,-7,-4,3,-31,-28,2,6,-2,-21,-28,-17,-7,4,-7,9,24,-15,-6,-16,-4,-9,-13,-7,-13,-26,-10,-5,35,48,43,48,43,47,45,49,36,45,50,28,35,41,37,23,23,29,41,40,40,15,34,34,41,33,28,22,22,40,41,46,44,27,46,43,51,48,16,15,43,43,49,45,39,-8,22,-20,21,-8,-12,-10,28,44,33,43,5,10,9,31,-18,30,-8,14,-21,-10,-19,-41,-21,-21,-32,14,39,38,46,37,1,45,43,-23,19,-7,-2,-22,-11,-18,-39,-15,-16,-17,20,3,31,28,0,17,-18,28,38,4,-30,12,-36,-32,2,42,7,25,21,34,45,49,47,46,50,48,45,21,8,-24,19,43,43,48,32,28,39,42,-6,-3,-20,-15,-43,-21,5,34,16,22,51,44,35,16,30,44,48,44,44,9,-11,-14,5,48,43,20,-9,37,46,50,6,44,27,32,18,-44,-24,31,-19,-35,-1,-17,-36,-20,-31,-27,-10,-9,-30,-46,-21,38,-24,-25,-28,-33,-47,-28,-34,-35,-3,40,-29,-16,-29,-31,10,38,35,32,32,-1,-16,3,0,3,37,1,43,29,37,17,-14,-36,-6,-27,40,48,37,48,21,-36,-16,-19,-18,28,-25,-8,-2,-28,35,32,-29,-39,-28,-44,-41,-41,-38,-40,-10,-17,-28,-5,-43,-30,-37,-38,-19,-24,-5,-3,-23,30,39,-37,-28,-2,-26,-18,-41,-30,-32,-42,-40,-46,-35,-48,-38,-34,-38,-48,-31,-6,-1,-2,-37,-31,-6,-27,-35,-31,-32,-45,-27,2,-2,-4,-9,-20,15,-4,-7,16,-5,-3,-14,-17,-16,12,24,39,20,2,43,6,5,46,-3,20,21,-2,-10,2,7,-5,-4,1,4,28,5,-2,-3,8,-2,15,16,20,10,-5,2,24,21,-13,19,9,-21,-28,-10,-11,-32,-20,-19,-18,-5,-26,-25,-31,-26,-12,-8,7,21,2,22,34,25,5,0,29,39,-16,-38,-6,-16,-3,-13,9,2,-6,-3,24,7,13,39,21,5,23,28,30,16,-8,-31,-37,-14,28,-16,-28,-9,-40,-17,-5,-17,-38,-7,-1,19,44,19,10,10,8,48,26,16,-45,-36,-18,2,-6,-17,-3,12,-16,14,31,-4,21,13,5,26,-11,-13,-8,-32,-25,-17,-48,-48,-40,-18,-9,-3,-45,-38,-25,1,25,50,33,22,-22,30,48,36,0,-29,-40,-17,-14,-43,-22,-22,-50,-47,-45,-40,-27,-26,-40,-50,-51,-51,-45,-44,-46,-24,-39,-3,35,-32,22,17,-21,-46,-46,-21,-35,-48,-42,-30,-47,-10,-25,-41,-30,-38,-43,-48,-43,-48,-45,-51,-50,-46,-49,-48,-31,-21,-37,-18,3,26,-25,-46,-36,-49,-33,-48,-20,13,2,-21,-11,-30,5,5,-35,-50,-44,-16,-10,-16,9,32,19,13,-16,-1,-32,-25,-21,-16,-32,-19,11,38,3,-12,14,-19,-47,4,13,22,-18,-16,-38,-4,-12,-32,-14,-1,-1,-19,0,-18,-13,13,20,30,-2,4,7,11,18,16,19,13,26,12,-16,7,-2,19,19,17,16,-1,19,-10,-30,-41,0,9,4,-3,-22,-23,-32,-20,-32,-25,-20,-40,-43,-42,-38,-41,-24,33,-3,-26,-13,-31,-27,-26,-20,8,45,34,5,12,28,-4,15,23,27,11,14,30,-6,-33,-33,-23,-14,-2,-3,7,6,9,-21,-24,-13,-26,-30,-24,-29,-13,-21,-31,-42,-47,33,26,24,35,34,41,28,7,34,35,41,35,17,19,8,21,10,-3,-22,-37,-49,-37,-21,0,-12,-5,-36,-42,-35,-28,-31,-25,-11,-28,-13,-21,4,2,-25,-29,21,-7,-12,-28,-18,-12,-8,-16,-19,-10,-34,-13,9,24,23,-6,-43,-9,4,-5,-17,-19,-10,-8,-22,-16,-24,-33,-38,-43,-36,-45,-20,-28,-16,-8,-26,-20,-28,-40,-47,-48,-37,-47,-46,-46,-50,-50,-50,-44,-48,-50,-37,-46,-37,-29,-32,-22,-27,-28,-24,-18,3,12,2,7,-5,-24,-17,-18,-15,-18,-40,-46,-51,-48,-43,-41,-24,-36,-23,-4,-25,-23,-21,-31,-28,-22,-32,-36,-25,-31,-28,-31,-36,-47,-32,-42,-35,-38,-22,-11,11,8,12,-6,10,22,23,8,-20,-10,-44,-43,-22,-33,3,-26,-31,-33,-37,-29,-42,-44,-44,-46,-47,-49,-48,-39,-48,-46,-45,-35,-49,-25,-46,-34,-15,-15,-11,-26,-5,-31,-48,-34,-31,-39,-50,-32,-10,-42,-42,-51,-46,-43,-50,-47,-41,-33,-20,-13,18,-23,-21,1,16,-16,24,20,6,18,-10,-12,-38,-27,-31,-10,-3,25,-16,5,22,-2,10,6,4,-1,10,-23,-11,7,24,1,22,11,2,4,2,-20,-24,-17,-37,-14,10,-23,-21,-18,-24,-37,-47,-33,-41,-15,-29,9,-45,-43,-41,-32,-37,-34,-11,14,15,-11,-2,-31,0,12,32,34,8,49,46,12,16,14,-9,7,15,-2,-28,-18,-25,-45,-35,13,21,5,8,-10,-17,-20,8,-25,-30,-3,33,-10,-43,-23,-35,-5,18,10,11,9,31,34,24,-11,12,-30,-39,-15,-18,-33,-28,-29,-30,-6,-13,-26,-28,-45,-49,-35,-32,-20,9,-13,-43,-46,-32,-50,-23,-41,-15,-33,-42,-43,-51,-45,-52,-53,-32,-10,-22,-12,-41,-12,3,-43,-13,-29,-21,-41,-21,-15,-19,-11,-8,1,-18,-35,-37,-27,-26,-33,-36,-27,-7,-11,5,-11,2,-1,17,40,30,24,-21,-7,7,17,-3,-25,-40,-46,-42,-35,3,13,49,43,34,10,-15,-48,-38,-35,-34,-31,-40,-24,-18,-35,-24,-24,-27,-31,-35,-43,-34,-39,-47,-48,-48,-40,-41,-33,-25,-41,-28,-44,-47,-48,-42,-24,-33,-42,-45,-37,-26,-23,-16,-33,-21,-26,-11,-37,-43,-48,-35,-23,-29,-35,-14,-29,-31,-4,22,-17,-20,-21,-9,5,-3,14,-10,1,-13,-23,-12,-32,-25,-25,-18,-24,-24,-12,-17,-12,-17,-28,-33,-34,-26,-33,-41,-50,-54,-52,-48,-52,9,-13,-45,-50,-54,-52,-51,-53,-43,-46,-40,-30,-35,-43,-33,-44,-23,-50,-42,-34,-39,-19,-19,-13,-9,29,16,18,13,5,7,20,21,1,0,15,2,17,19,25,23,28,30,27,28,28,23,19,15,2,2,-18,-45,-43,-25,-37,-23,-27,-29,-35,-36,-41,-40,-19,22,-4,12,23,-15,10,-4,-36,-36,-41,-38,-15,-38,-38,-30,-34,-25,-16,-28,-44,-36,-44,-43,-45,-18,-39,-30,-41,-32,-14,-24,-15,-32,-4,13,-34,-40,-40,-45,-23,-32,-16,-34,-36,-12,-32,-21,24,27,29,21,25,-1,16,-51,-50,-40,-39,-49,-51,-48,-47,-52,-52,-43,-31,-43,-34,-18,3,-8,-4,-12,-38,-41,-23,-41,-48,-40,-34,-40,-28,-20,-29,6,-28,-48,-48,-39,-40,-30,17,28,47,43,-5,4,18,15,5,18,22,15,8,16,-8,6,16,15,20,23,24,24,17,11,12,14,25,37,36,34,48,50,28,38,29,19,5,-7,-3,20,-11,-28,-28,2,-4,-15,-41,-2,23,15,-37,-1,-6,26,16,14,-19,-40,-43,-50,-49,-50,-46,-26,-42,-17,-30,1,-16,16,31,-27,-45,-51,-43,-33,-19,-42,-32,-17,38,-2,9,29,-25,-33,-20,7,11,-2,-10,14,35,41,6,-31,-15,23,14,16,-9,6,-21,-28,37,39,40,30,6,-5,11,-3,-13,-29,-10,-37,-29,-4,-26,-29,-30,-35,-40,-27,-18,-16,-31,-34,-26,-16,-11,-17,-8,-16,-15,-33,-13,4,3,-27,-47,-30,-49,-30,-29,-13,16,-35,-45,-40,-43,-36,-29,-13,-9,-12,42,43,-34,-31,-33,-8,-29,-28,-9,-24,-8,-14,-34,-42,-31,-31,-19,-43,-7,-22,-44,-31,22,-26,-36,-20,5,-10,-37,30,27,-16,2,-6,-11,-20,-18,-21,-30,-24,-17,-16,-23,-48,-42,-15,-39,-5,-38,-30,-33,-50,-41,-42,12,12,27,3,2,-42,7,-3,-8,3,36,40,24,18,0,-5,31,10,-8,-47,-22,-30,9,-42,-23,-13,-13,-25,-43,-28,-11,-4,-31,-29,-15,-25,-43,-37,-38,-37,-42,-41,-48,-27,-36,-26,-10,-37,-19,-40,-34,-24,-24,-34,-37,-19,-32,1,-46,-8,-53,-45,-30,-46,-41,0,-48,-18,-12,-4,-51,-46,-15,14,-49,2,-17,-10,10,16,-11,-42,-27,-35,-16,-38,-1,9,5,-48,-45,-14,-11,-19,-8,-14,-15,-37,-8,-37,-36,-16,-34,-45,-35,-16,-14,-47,-47,-24,-13,-30,-7,26,1,21,-9,-19,-12,26,44,25,-24,35,40,10,12,-20,18,30,-14,-28,11,-31,-12,5,-20,-4,5,-16,-16,-50,-39,-39,-33,-51,-41,-42,-45,-45,-48,-45,-47,-43,-30,-50,-46,-51,-39,-36,-34,-44,-41,-38,-30,-13,46,40,49,41,38,-10,37,33,20,13,8,-50,-44,-35,-35,-33,-27,-14,34,12,-16,-15,-16,-35,-38,-20,-25,-40,-19,22,24,-2,-30,-23,14,-28,-20,-33,-33,-6,-27,-3,-13,21,-29,-42,-33,-33,-25,-22,-27,-31,-22,-42,-27,-49,-22,-29,-17,-17,19,25,-16,-6,-53,-49,-41,-44,-23,-42,-28,-31,-5,14,-31,-21,5,28,39,34,36,17,-35,-49,-30,-26,17,12,-9,17,14,11,40,38,-16,5,-26,7,-2,-22,-23,-36,-18,2,19,8,-18,-8,-6,-22,1,-17,-21,-19,-10,25,-6,-11,-11,-33,-22,-27,-45,-33,-43,-43,-28,-19,-22,-9,20,9,9,16,16,-3,17,23,22,-12,-1,-4,4,7,-1,-5,-25,5,-37,-23,38,8,-46,-25,-32,-38,-51,-3,30,-29,-30,-18,-46,-18,-19,-40,-27,-29,-7,27,14,-15,-20,2,-28,-7,-13,31,27,8,-8,12,-4,-12,-21,-12,-43,-31,-27,-16,-32,-38,-37,-37,-17,-17,-13,-43,-44,4,-14,-16,5,-18,5,-26,-10,-16,-15,-25,-10,-15,12,20,-5,-36,-42,-20,-40,-6,-25,-15,-38,-19,-17,-34,0,-52,-49,-31,-1,-16,-5,-21,-50,-51,-37,-32,-28,-32,-30,-37,-8,0,-10,-37,-39,-27,8,7,14,0,-7,-25,-7,-38,-18,-31,-38,-51,-53,-11,-47,0,-36,-41,-54,-50,-37,-25,11,-20,-21,-15,-26,-8,-22,16,-10,-32,-44,-42,-36,-31,-23,-36,-45,-36,-35,-23,-26,-35,0,7,25,22,19,-6,10,-32,-24,-21,-15,-15,-7,-12,-20,-43,-33,-37,-27,-50,-25,-27,-12,-23,-29,3,14,-14,-12,-16,-17,-17,13,-27,-9,2,-32,-40,-47,-49,-33,-1,-39,-44,2,-24,-45,-48,-30,-14,-13,30,-3,6,3,15,5,13,33,13,7,9,2,-4,17,-27,-24,-14,-15,5,-39,7,17,-19,-32,-34,-12,1,-13,-25,-16,-38,-48,3,5,12,-18,-45,-39,-32,-30,-33,-24,-30,-6,-18,-19,-34,-15,-28,-49,-39,-50,-53,-19,-23,-39,-25,-43,-43,-38,-52,-8,-40,-36,6,-4,-17,-20,-52,-11,-43,-11,-14,-29,-21,-28,-27,-37,-42,-29,-28,6,-16,-31,-41,-41,-21,-37,-45,-40,-43,-4,-35,-55,-19,-18,-30,-35,-47,-52,18,15,-37,-25,-46,-50,-48,-41,-43,-51,-51,-35,-38,-53,-50,-53,-47,-49,-53,-41,-32,-40,-25,-47,-45,-47,-51,-53,-32,-36,-2,-53,-50,-37,11,23,3,-41,-40,-44,-34,-33,-47,-18,-16,-13,-4,-48,-42,-42,-27,39,48,-30,7,-14,-6,-17,-15,-50,-46,-28,-22,-35,-31,-46,-46,-36,30,-14,51,30,21,-47,-40,-1,-16,15,-21,-48,-32,-7,-48,-8,-15,-35,-53,-47,-18,-15,-29,-11,-9,-35,-22,-53,-45,-40,-24,-26,44,50,43,31,-11,8,38,36,14,-5,31,-22,-2,0,-11,14,-33,-7,-9,-49,-32,-14,40,-27,-10,-27,-3,11,-16,14,2,-50,-49,-34,-20,-22,-36,-28,-10,-31,-37,-24,-40,-50,-33,-42,-42,-50,-45,-30,-48,-54,-52,-53,-47,-40,-48,-42,-43,-34,-27,-31,9,-42,-35,-4,-17,-8,6,12,-5,-27,-3,-4,-3,7,39,22,20,48,-25,-47,-43,-12,-26,-40,-35,-38,0,-8,-32,-34,-15,-39,-43,-40,-38,-45,-43,-52,-46,-42,-38,-53,-54,-54,-51,-51,-47,-44,-53,-51,-48,-52,-32,-30,-50,-51,31,50,10,-22,-13,34,50,21,44,4,-11,20,18,30,20,-7,-12,14,-39,-24,-19,-11,-43,-18,11,6,-15,-43,-30,-27,-34,-38,4,-23,-9,-11,-10,-24,-6,-40,-51,-48,-28,-42,-48,-36,-20,36,-34,20,-3,-13,-14,0,38,27,3,-25,16,39,51,47,16,16,49,49,35,-2,23,19,31,40,42,39,26,0,45,54,52,53,55,48,18,-33,-28,51,53,11,-37,-29,42,41,-42,-52,-47,-23,-10,35,32,50,35,35,51,39,-20,2,-28,-14,36,12,-43,4,-6,12,-16,1,22,-29,23,0,2,2,-7,-34,-36,-50,-45,-13,-34,-30,-10,-16,23,5,9,9,38,27,26,35,19,-30,3,-35,-26,-18,21,6,-35,-26,-11,-38,-18,6,-17,-44,-35,-28,-22,-32,12,33,28,-14,-39,-37,-36,-29,-34,-45,34,45,25,-52,-16,-44,1,12,4,3,-16,34,28,44,38,46,45,53,47,44,-10,-8,8,15,7,3,31,-7,-15,-9,9,19,23,12,-4,-10,-40,-33,-43,-49,-52,-49,-50,-56,-56,-33,-56,-54,-47,-52,-56,-51,-49,-49,-51,-46,-5,-20,-37,-2,9,-15,-26,-9,-6,-33,-12,38,21,30,49,42,22,-31,-31,-20,5,2,14,0,30,27,24,45,31,34,47,52,51,24,30,-1,1,49,45,34,24,27,-22,-1,-27,11,22,-16,-11,4,-2,33,-16,-29,9,8,22,-4,-15,-18,-7,13,48,51,46,24,22,-23,-25,-18,-31,-27,-23,-16,-15,-20,-21,-18,-4,-17,-21,-37,-10,19,13,-3,-2,-8,-29,-17,-46,-19,-33,3,34,11,16,-23,-36,11,-40,-8,-15,-21,-20,-32,-19,-20,-27,-19,-20,-12,-36,-52,-26,-44,-45,-38,-38,-50,-28,-40,-43,-42,-49,-50,-25,-32,-53,-40,-44,-20,-39,-13,-30,-26,-31,13,4,3,-26,12,-20,-37,-45,-43,-42,-34,-49,-26,-52,-55,-20,-15,10,-4,-14,-3,-15,-44,-14,-40,-22,-42,-22,-41,-39,-34,-31,-50,-55,-43,-17,-47,-42,-12,-31,-45,-50,-52,-23,-34,-52,-22,-5,-44,-53,-44,-17,-34,-25,-16,-45,-15,-25,-28,-22,-33,-33,-28,-36,-42,-54,-47,-38,-37,6,39,45,5,-52,-48,-45,-43,-49,-3,-22,-8,-28,-49,-38,-11,-25,-36,-43,-41,20,10,-7,-22,20,19,40,38,27,20,-12,14,40,52,-11,2,-10,45,-4,17,5,-4,-42,2,10,16,-11,-32,-24,1,-31,-32,-40,-42,-49,-40,-54,-46,-54,-37,-4,-24,-47,-40,-29,-20,-28,-30,-39,-47,-24,-24,-32,-54,-51,-52,-46,-54,-37,-29,-25,-46,-34,-47,-1,-32,-16,-41,-23,-28,-42,-47,-47,-54,-47,-37,-42,-54,-17,2,-44,-48,2,-43,11,-16,-19,-45,-39,19,-17,-26,20,-11,-31,-45,-43,-18,-25,-20,-28,-38,-40,-48,-44,-27,12,-3,-1,-17,-12,-24,-4,-36,-33,-26,-39,-29,-31,-31,-24,-22,-24,-33,-51,-45,-51,-48,-48,-14,-37,-29,-21,-38,-35,-6,-47,-21,-12,-38,-29,-25,4,-6,-13,17,-19,-19,-10,-29,5,35,9,-42,-42,-47,-32,-32,-23,-27,-36,-8,-22,-28,15,-23,-42,-36,-13,-45,-27,-15,-14,-25,-24,-36,-48,-53,-41,1,-51,-22,-9,-11,-33,-37,-45,-34,-52,-44,-47,-36,5,-31,-19,-35,-49,-19,43,26,27,19,-11,-28,-45,-52,-36,-18,-8,-4,-48,-26,20,-39,-13,-18,-8,-19,20,-21,-43,-37,-39,-19,-3,-43,-47,-22,-28,-14,-41,-46,-48,0,-46,-42,-39,-46,-27,-20,-29,-26,-33,-30,-22,-7,-24,-30,-6,3,-22,-12,-19,20,-32,-21,-8,-15,15,16,-34,-24,14,-8,-11,12,23,17,2,-39,-31,-30,-36,-44,-52,-47,-47,-25,-38,-40,-30,6,-14,-38,-44,-34,-56,-40,-50,-51,-54,-54,-56,-57,-56,-56,-50,-34,4,-23,-48,-31,-44,-38,-27,-34,16,3,32,23,13,-22,-9,39,13,8,-1,-12,1,20,48,29,-17,-12,-24,-28,27,52,55,53,-5,-52,-11,-11,-38,-43,-35,-25,-8,15,53,25,-11,-19,-23,-25,-34,-54,-58,-54,-45,-23,-33,-10,1,-37,-47,-47,-55,-51,-51,-10,-10,11,45,53,6,-42,-2,-17,-53,-28,45,-8,-50,-55,-54,-52,-35,-36,-56,8,-42,-53,-34,-44,-39,-50,-36,-34,-50,-17,44,-13,-30,37,-9,-31,-15,25,-16,-6,-44,-37,-29,-31,-43,-35,-1,11,-32,-51,-22,-24,-34,-29,-34,-16,-30,-15,-54,-46,-21,-26,-13,-16,-36,-37,-37,-5,-9,7,-3,-30,-26,-13,-5,-40,-54,-14,-55,-55,-54,-53,-55,-43,-11,25,-8,-42,-50,-6,-46,-41,3,-10,-38,-43,-43,-53,-18,-54,-52,-52,-53,-41,5,-28,-48,-54,-51,-49,-30,-31,-37,-41,-19,-20,-7,-31,-24,-36,-42,-33,-6,-7,-22,-49,-30,-52,-36,-38,-30,-49,-47,-54,-55,-50,-15,-48,-4,32,-8,-17,11,20,-6,-5,-3,-19,-28,-14,-18,-22,-25,-25,-5,-28,-31,-42,33,35,14,-10,44,11,-4,25,25,13,46,-5,-8,40,-28,50,-35,-39,-38,0,2,-8,-52,-23,-19,-5,-23,-54,-50,-26,-32,-49,-49,-19,-8,-52,-54,-55,-54,-41,-32,-41,-24,-30,44,14,19,14,11,22,1,-1,-41,-24,-13,1,12,-53,-35,-22,-36,-25,-45,-39,-43,-34,2,34,-21,-53,-15,-7,-47,-48,-48,-57,-43,-30,-42,-31,-40,-30,-13,-27,-19,-24,9,8,-1,-11,-7,-35,-25,-15,-38,-42,-46,-47,-48,-49,-53,-52,-49,-43,-48,-52,-44,-49,-4,1,15,17,-26,3,39,0,-6,-47,-35,15,45,-10,-45,-7,-14,-13,33,-35,-19,-32,-27,-1,-20,-5,16,-13,-15,-35,-16,-19,-8,-31,-48,-20,-49,-22,-51,-49,-6,-18,-15,-3,44,38,17,8,15,-27,-1,4,39,-1,28,7,24,15,0,-38,-29,1,7,11,24,35,5,9,18,28,36,2,18,-13,-6,26,2,-15,-17,10,-4,16,0,-2,34,2,1,27,15,-4,40,0,16,35,12,-2,0,31,51,20,32,45,54,32,22,52,-36,-57,-46,-44,-50,-51,-56,-45,-13,16,32,-37,-12,-40,-1,2,-27,15,46,30,-10,19,30,23,7,20,38,-25,-8,-7,-21,20,5,-4,23,-2,26,2,48,44,-7,50,53,-6,23,42,54,39,47,40,36,4,9,27,46,48,29,46,46,-37,39,49,35,41,35,38,44,50,53,51,46,37,55,47,51,47,57,49,54,53,51,47,52,56,44,22,21,8,26,53,51,49,42,53,51,43,46,27,-2,11,12,15,38,42,37,41,32,14,16,41,19,35,20,28,29,23,-21,-20,34,46,-4,18,0,21,-39,49,49,56,31,-16,28,2,37,49,51,52,-6,-6,35,56,56,46,-7,8,43,47,15,12,22,35,-1,28,56,42,43,46,42,48,38,45,33,42,-9,-22,29,43,54,34,36,48,47,35,45,34,36,43,27,17,27,49,45,32,9,48,48,42,36,34,25,40,47,50,20,52,54,40,41,45,34,46,39,23,49,48,41,40,45,52,31,39,19,36,49,20,8,0,46,40,44,21,23,2,-18,26,16,8,46,25,7,55,39,35,50,25,40,41,41,42,34,47,51,46,22,24,51,42,38,40,14,41,41,52,31,3,-16,-2,6,20,28,33,-31,10,-13,-3,-32,-8,15,2,-10,-25,10,-25,-37,-20,-51,-42,-32,-31,-43,-11,0,32,-32,26,46,38,47,46,40,43,29,44,49,37,53,52,-10,41,-1,33,43,18,46,26,37,20,9,33,41,36,46,51,51,52,54,52,56,44,33,31,16,20,31,51,44,39,23,46,51,52,50,37,48,44,44,31,38,53,52,56,29,-16,-34,6,7,-5,-21,37,47,43,39,13,44,28,5,-36,-18,-5,7,42,31,31,-21,23,49,26,-7,-23,-14,-27,-41,-48,-51,-46,-31,-22,-41,-42,-4,12,-16,-29,-21,5,16,-38,-27,13,25,30,26,15,29,23,-5,-32,7,42,38,17,34,20,19,-21,15,-3,18,47,39,-19,-49,-35,-40,17,24,34,7,20,-12,-17,-29,-37,-17,-7,-13,5,3,4,23,47,43,48,49,5,41,38,41,35,38,36,36,25,-19,-10,-22,-2,18,10,-1,20,31,37,36,-3,-14,-12,-6,-24,-30,-3,11,15,14,27,42,26,2,-9,-17,-7,9,25,-3,-7,-26,-39,-16,25,49,38,13,23,13,24,-5,-10,-30,-42,24,22,28,43,30,21,46,56,55,47,44,10,-16,-28,-29,-20,-19,-36,-34,-27,5,3,0,4,-13,-18,-16,27,-5,-21,5,-12,10,36,3,-2,16,22,55,46,14,19,8,-19,-2,9,-13,-7,-2,-28,-28,18,-18,-10,-6,-43,-29,-24,-6,2,-6,0,17,46,39,21,20,44,12,38,36,10,5,-37,-55,-46,-39,8,-55,-49,-39,-53,-21,-2,-3,-35,-29,-41,-46,-6,0,-34,-38,-56,-15,27,-5,28,31,1,28,7,0,-48,7,26,-5,20,54,54,56,48,48,45,52,-19,3,55,52,38,51,52,50,52,49,56,35,54,13,16,30,30,49,48,36,27,28,50,49,40,28,8,-39,-36,-37,-38,-23,-5,0,-4,26,33,24,14,20,30,21,27,34,14,17,-2,6,6,-8,-6,25,35,9,-45,-57,7,39,52,-5,-33,-13,46,32,-1,23,-35,52,33,29,13,-12,-17,39,27,1,33,15,35,-17,3,42,31,11,47,36,36,34,38,-27,35,40,24,22,10,24,38,-11,32,42,34,18,45,23,15,-6,-37,1,-1,14,-2,11,-36,-41,-43,-44,-35,-37,-38,40,36,24,39,-8,-10,-54,-54,-33,10,1,38,31,7,-2,-11,-24,-25,-29,-23,-49,-40,-12,-16,-25,-52,-45,-3,-47,-33,-2,-39,-39,-2,-3,-21,27,0,-28,-40,-46,-32,-43,-32,-8,-6,-18,-15,-43,-10,-29,-20,-41,-41,-27,-31,-47,-47,-48,-28,-32,-33,8,10,-6,-13,-14,-29,-17,-15,2,21,34,8,-1,25,7,-32,-19,-36,14,40,10,21,8,45,55,47,-13,-22,-1,-16,-48,-45,-9,1,12,36,41,46,31,50,48,44,23,40,35,15,40,52,36,1,40,39,53,44,29,34,51,53,48,31,27,49,51,56,53,49,52,49,-15,1,27,-7,-33,-15,1,0,-19,25,-3,9,3,-16,-36,-31,-2,-4,14,31,48,53,34,16,2,20,-9,0,-41,-45,1,15,2,5,12,-10,-6,6,12,10,22,20,41,17,46,17,-28,15,-18,-10,32,38,-14,40,-8,38,-2,-12,-5,25,23,-19,-18,6,5,20,10,16,-8,9,29,14,-1,36,5,6,42,24,-36,-22,-35,-42,-15,-35,29,9,6,34,32,9,4,17,-21,11,52,48,25,36,34,30,41,51,27,12,15,-15,33,31,51,51,39,3,-16,13,16,50,55,40,21,18,-28,-10,-16,0,-3,-20,-8,8,36,31,47,42,50,49,51,28,27,25,48,46,52,53,-4,13,-42,1,15,13,3,27,6,-2,-36,-4,-35,-4,29,5,-18,0,-14,6,41,55,37,51,12,8,5,-4,-12,-8,-27,-50,-9,24,-18,-39,53,-11,26,27,2,-19,-6,32,1,29,-34,-7,-21,-45,5,-8,-24,-3,39,-25,0,13,29,-1,-14,-7,16,1,25,-4,0,-20,0,-5,25,40,56,44,28,42,23,7,0,-11,7,7,2,37,27,52,35,10,2,21,-20,-7,34,-7,-18,-30,-35,-33,-37,-16,-44,-31,-41,-38,-38,-29,-36,-7,-42,-14,-30,-26,-23,-25,-6,11,15,35,28,29,30,-35,-55,-58,-51,-54,-42,-49,-12,-9,-23,-55,-25,-38,20,8,-10,13,-8,-28,-24,20,56,43,28,0,4,9,25,36,-1,11,-9,-1,7,-8,-27,-3,-10,14,26,33,-27,-24,-27,14,49,44,-27,-8,42,-23,-5,-18,4,-1,-5,-32,-21,26,4,-13,-31,4,44,30,26,34,22,31,47,33,45,25,34,34,16,11,-33,-3,34,-19,-22,-10,8,26,22,44,11,18,0,-4,18,3,14,0,-16,34,10,12,8,-35,-42,-11,11,-17,-27,-32,-25,-39,26,22,-6,-12,-28,-5,-15,-43,-37,-15,-13,-12,-10,-10,-17,-6,-14,-28,-19,-31,-41,13,-33,-31,-6,-11,7,8,50,51,38,7,8,24,44,49,7,12,28,48,56,34,28,19,-14,-48,57,29,17,42,-10,-31,-30,22,-1,10,1,-13,-20,39,19,14,41,41,-15,3,-8,-48,-24,-5,-43,-27,-11,-20,-5,-41,2,-18,16,2,4,37,49,49,44,31,6,-4,20,14,17,41,33,16,18,20,44,44,3,-19,-10,31,51,23,-8,-9,-20,10,53,39,11,-27,-34,11,27,30,48,20,-2,7,-20,-34,-18,-18,-36,-30,-14,30,33,13,-34,29,46,13,6,45,43,40,17,1,20,15,44,-15,24,-9,32,-1,0,-14,16,19,8,-1,6,6,24,18,0,-10,-12,-17,-41,-15,-4,-35,7,34,-13,-1,-56,-35,-30,-20,-33,-35,-3,-50,-55,-19,-40,-28,-28,24,-48,-29,-48,-26,29,10,29,8,45,36,52,20,-32,-45,-4,7,11,5,-7,4,-4,0,7,14,27,12,17,40,58,55,51,55,51,43,31,37,36,51,53,38,-2,21,32,-1,5,-8,-25,-25,16,-17,-6,13,26,26,38,-9,-16,18,10,10,-33,-31,-23,-7,-39,-22,-16,19,-26,-28,-22,-38,-48,-52,-46,-49,-42,-46,-23,-18,-53,-17,-13,11,-36,-13,-25,-6,17,20,-29,27,-7,-9,-22,-28,-21,-34,-6,-39,-26,-47,-17,-23,-23,-35,-42,-44,-53,-50,-25,39,7,-4,50,18,45,-6,36,56,35,-36,-39,-50,-45,4,32,-20,0,-17,-9,-14,-26,-42,0,-12,26,1,-21,-58,-44,-36,-25,-59,-25,-13,-20,-44,-53,-30,-13,-15,-56,-49,-15,-1,-7,-14,-17,-34,8,39,42,34,17,38,25,41,42,16,24,15,13,25,54,56,52,55,28,-1,-13,10,31,55,55,43,-20,-52,-50,-52,-46,-42,-19,-43,-35,-29,-24,-30,-39,-37,-9,-25,5,30,-18,-31,-26,13,26,33,-13,5,-3,11,21,26,10,16,13,16,11,-23,-11,-46,-51,-46,-50,-32,-49,-41,-26,-20,-50,-50,-49,-49,-23,-27,-40,-60,-36,-36,-44,-51,-50,-46,-34,-10,-6,-38,-21,-41,-43,-48,-42,-12,-21,-41,-44,-45,-29,-17,7,-16,12,-26,-34,-42,-7,-16,18,-22,-52,-33,36,13,-24,-36,-49,-10,8,-28,-36,-45,-38,-40,-46,-49,-57,-33,-8,9,-31,20,41,56,-19,-23,-39,5,17,30,-7,20,41,51,21,31,31,16,-5,-42,5,-3,8,-2,-3,49,43,44,51,50,48,22,49,6,-10,21,39,-46,36,56,36,21,22,13,32,55,56,55,48,39,51,50,43,-2,2,50,48,38,10,54,53,55,55,55,50,17,9,11,32,17,-5,25,14,49,18,39,38,23,29,41,46,52,49,44,33,43,33,33,34,9,50,16,13,51,46,-9,-23,13,10,-3,-1,-24,-4,-21,25,20,15,47,10,-25,-45,-60,-36,-8,-11,-39,2,-18,19,7,22,6,-15,-25,-33,-13,-21,-29,-10,-19,47,-36,26,-7,19,35,11,-5,35,44,18,22,-5,13,-9,-12,29,44,3,-13,12,11,3,-3,-10,13,7,6,39,38,-3,30,15,-2,-15,-2,-1,4,26,5,29,5,19,41,48,33,43,4,-39,-42,-11,28,-30,-37,58,41,51,56,55,34,29,44,2,51,43,49,29,18,31,54,43,36,34,46,45,33,44,39,12,38,41,52,36,15,31,37,23,21,10,6,35,18,18,17,-7,27,-7,34,35,47,49,51,38,-3,23,49,52,51,27,26,-10,46,38,-32,39,26,-10,-27,-13,16,-2,-10,-34,29,31,28,13,-8,20,40,27,33,21,40,18,22,2,42,51,29,36,36,32,12,23,12,10,30,30,15,12,22,-35,9,-22,34,-23,-57,-50,10,17,16,23,33,25,-27,-26,-16,-21,-18,-23,-32,22,31,33,41,19,43,32,19,-38,-1,23,51,49,28,16,5,56,53,56,40,16,18,32,40,30,30,35,54,20,33,44,41,17,48,35,31,45,55,37,0,-37,-30,-30,-36,-4,2,-4,-24,-31,-13,-21,-35,-43,-38,-1,11,9,-5,-20,-3,-13,-8,-22,4,-57,-27,-44,-46,-55,-30,-18,0,8,-5,-5,-1,6,48,29,16,17,4,13,-19,-33,8,42,55,35,45,31,37,41,29,28,16,0,-16,-18,30,-9,-26,-22,18,-4,55,23,38,51,22,50,39,-27,-16,-33,-14,12,28,7,-24,2,-7,19,24,14,45,50,49,46,29,36,-27,1,-11,-20,-11,-19,13,0,-48,-13,-39,-43,-60,-51,-42,-15,-28,14,14,0,4,34,33,3,24,-4,13,47,48,41,-3,14,18,-33,11,-33,-38,-49,-44,4,-11,8,-18,-3,-22,-26,-40,-26,-37,1,-10,-17,-26,-39,12,-54,-54,14,2,37,52,-5,-55,-50,-38,-49,17,-44,-5,-18,-11,14,35,4,-27,-49,-34,8,-32,-27,-32,-12,-13,-17,-27,17,-10,-9,29,-13,-41,-6,-46,-47,-23,-47,-40,17,0,-43,-37,-47,-60,-33,22,30,40,40,-7,24,34,8,29,-37,5,35,50,23,58,59,39,11,14,49,59,58,-32,-6,20,44,-6,-24,-7,20,-4,30,26,-39,4,20,42,22,-2,45,52,46,46,45,-6,11,50,35,18,-8,13,16,19,41,32,27,-8,0,-21,27,15,30,42,13,24,17,51,-15,13,37,-21,1,-33,-44,-50,-46,-44,11,11,-20,-25,-8,-39,-40,-44,44,21,18,39,21,57,22,-8,44,54,53,53,52,43,46,49,42,42,47,39,49,55,52,23,31,56,16,24,13,0,31,-26,-25,-12,-45,-29,-24,-6,8,22,37,26,12,11,-38,-7,0,-4,2,-40,-31,-10,-47,-37,-50,-37,-36,-23,-29,-35,-58,-54,-53,15,1,-7,-6,38,14,59,40,54,37,1,36,19,-3,-17,-29,-19,15,-16,-41,-10,-49,-38,-49,-29,-33,-52,-51,-25,-39,-50,-25,-53,-44,-38,-43,-19,-37,-37,19,-35,-50,-53,-20,-25,-10,29,-42,-9,17,-32,21,-17,0,-25,-27,-32,-56,-35,-12,5,24,24,22,-11,13,10,2,-18,27,58,-8,2,15,41,42,36,2,4,37,12,-9,57,33,53,24,-17,4,8,40,33,30,19,-7,-10,-26,54,51,22,-21,2,28,39,26,45,46,8,54,57,61,33,52,-26,-9,26,57,62,33,-4,26,44,19,39,12,31,42,10,2,20,57,9,8,40,35,17,34,42,13,9,17,10,13,14,20,19,11,13,20,30,47,-18,-39,15,9,13,-10,8,18,32,10,0,14,4,12,10,2,7,-17,7,10,-9,6,19,42,31,26,-5,58,54,41,25,37,0,22,2,-12,-32,3,8,8,-8,47,-12,46,8,22,-28,-27,27,49,48,53,57,56,52,58,52,58,35,46,46,28,18,-2,23,25,10,7,-9,-24,6,8,33,21,10,-14,3,-16,13,13,-18,41,0,-13,-12,13,12,-39,-28,5,-15,-40,-33,-22,13,-39,48,30,6,25,1,-9,31,8,-29,-21,-23,-28,-31,32,2,-33,-24,-11,-1,-3,16,21,37,25,5,6,0,7,40,19,12,6,20,26,20,44,23,59,59,35,48,46,20,27,7,-22,18,4,44,42,55,-9,45,43,31,43,-13,-31,-20,-52,-58,-26,-25,19,-9,-27,-26,-19,-24,30,-1,11,6,-22,32,26,5,0,2,-47,-62,-37,-25,-57,-40,-30,-19,21,9,15,28,13,19,48,24,47,40,-5,0,-37,-29,-53,-22,35,18,-31,-35,-39,-14,-57,-24,-26,-29,-45,-48,-20,-44,-45,-39,-59,2,-25,7,26,2,9,6,-3,-31,-29,-18,1,-44,-26,-28,-19,-25,5,-46,-12,-33,-41,24,29,5,-25,-14,20,38,-50,-24,-12,17,16,10,7,28,33,40,-18,11,34,19,4,54,-29,10,-2,25,43,19,21,37,-40,6,5,12,34,26,58,35,62,47,-17,-2,21,9,-27,-21,10,-7,-14,-11,1,-15,-56,-40,-55,-28,-28,-59,-59,-44,-54,-54,4,34,53,57,50,11,11,-2,-13,-8,18,24,-22,-17,-12,-43,-13,-29,-26,-14,-19,-25,-3,-26,21,10,2,26,10,-54,7,25,37,49,61,54,-3,-56,13,43,-24,-57,-49,-13,-44,12,-9,25,9,6,-10,30,19,17,16,40,-7,9,20,20,13,10,10,5,48,22,9,16,8,-18,-16,14,40,31,-2,8,11,9,10,-5,2,2,22,37,38,28,-6,25,51,29,34,31,13,14,18,30,16,7,9,19,18,18,42,28,19,10,28,20,24,42,57,34,47,8,-4,-8,-46,-53,-53,-56,-41,-42,1,-18,35,40,42,47,53,53,51,49,29,33,49,42,42,-14,33,26,-21,44,58,59,56,55,62,54,61,53,45,-11,45,55,51,4,4,7,41,40,26,-15,26,6,-22,-30,-53,14,31,9,27,-9,-37,-43,-11,-28,-26,24,31,37,48,32,41,48,29,12,8,-9,-2,4,-5,-11,-19,-9,13,18,31,26,16,-5,13,9,-15,1,18,20,24,35,41,38,20,45,51,48,56,42,40,51,52,47,57,44,38,56,19,-4,-15,26,16,-4,-23,-11,-39,-37,-32,-11,-2,-49,-31,-25,-21,3,-23,-38,-21,16,29,11,15,42,42,49,44,38,42,37,49,58,55,30,58,62,61,64,56,60,62,57,57,59,63,62,64,62,62,45,56,34,15,12,7,0,-9,12,-29,-45,-57,-57,-52,-12,-20,14,1,7,5,-18,40,38,6,19,2,22,34,56,25,22,17,15,13,45,51,24,21,34,-9,-13,-9,-24,-31,-49,-56,-50,-54,-44,-33,-32,-58,-24,-18,-13,-22,-48,-24,-39,-26,-20,-18,-20,3,7,8,29,14,8,39,39,56,54,59,62,64,40,26,-23,-46,-33,-39,-59,6,-28,-24,16,20,28,19,19,9,10,10,8,-4,5,59,36,21,4,-4,22,2,59,64,58,43,49,58,-35,-4,-10,-17,-25,-13,-1,24,53,48,46,-13,-51,-62,-21,-17,-38,-41,-45,-24,23,-44,-34,-30,-40,-27,-20,-54,-42,5,-50,-17,-21,-36,-18,3,0,41,57,12,5,-11,-49,-31,8,-16,26,10,-45,0,19,-14,-26,12,-29,-54,-23,-11,-6,-17,13,26,40,-18,-49,-42,36,-45,13,-36,-31,-13,-16,-11,-45,-13,-24,-13,-23,-16,19,41,-1,-14,-5,9,-3,23,27,21,29,-11,-20,-14,-20,-39,-34,-25,-21,-7,-28,-17,-22,-23,-35,-37,-27,-14,7,5,-10]};
+const TPTS=(()=>{const la=[],lo=[];let a=0,o=0;for(let i=0;i<TRK.dlat.length;i++){a+=TRK.dlat[i];o+=TRK.dlon[i];la.push(a/1e4);lo.push(o/1e4);}return{la,lo};})();
+function snapToTrail(lat,lon){
+  const cosl=Math.cos(lat*Math.PI/180), R=3958.8, K=Math.PI/180;
+  let bi=0,bd=1e18;
+  for(let i=0;i<TPTS.la.length;i++){
+    const dy=(TPTS.la[i]-lat), dx=(TPTS.lo[i]-lon)*cosl, d=dy*dy+dx*dx;
+    if(d<bd){bd=d;bi=i;}
+  }
+  let bestT=bi*TRK.step, bestOff=Math.sqrt(bd)*K*R;
+  for(const j of [bi-1,bi]){
+    if(j<0||j+1>=TPTS.la.length) continue;
+    const ay=TPTS.la[j],ax=TPTS.lo[j]*cosl, by=TPTS.la[j+1],bx=TPTS.lo[j+1]*cosl;
+    const py=lat,px=lon*cosl;
+    const vy=by-ay,vx=bx-ax,L2=vx*vx+vy*vy; if(L2===0)continue;
+    let t=((px-ax)*vx+(py-ay)*vy)/L2; t=Math.max(0,Math.min(1,t));
+    const qy=ay+t*vy,qx=ax+t*vx;
+    const off=Math.hypot(py-qy,px-qx)*K*R;
+    if(off<bestOff){bestOff=off;bestT=(j+t)*TRK.step;}
+  }
+  return {mile:trk2nom(bestT), off:bestOff};
+}
+let gpsBusy=false;
+function doLocate(silent){
+  if(!navigator.geolocation){gpsMsg("GPS not available in this browser");return;}
+  if(gpsBusy)return; gpsBusy=true;
+  if(!silent) gpsMsg("locating… (can take up to a minute)");
+  navigator.geolocation.getCurrentPosition(pos=>{
+    gpsBusy=false;
+    const s=snapToTrail(pos.coords.latitude,pos.coords.longitude);
+    state.lastFix={mile:Math.round(s.mile*10)/10,off:Math.round(s.off*10)/10,t:Date.now(),
+      lat:Math.round(pos.coords.latitude*1e5)/1e5,lon:Math.round(pos.coords.longitude*1e5)/1e5};
+    persist(); renderAll();
+  },err=>{
+    gpsBusy=false;
+    gpsMsg(err.code===1?"Location permission denied — enable in iOS Settings → Safari → Location":err.code===3?"GPS timed out — try again with a clearer sky view":"GPS unavailable right now");
+  },{enableHighAccuracy:true,timeout:45000,maximumAge:60000});
+}
+function gpsMsg(t){for(const id of ["gpsStatus","gpsStatus2"]){const el=document.getElementById(id);if(el)el.textContent=t;}}
+function maybeAutoLocate(){
+  const st=state.settings;
+  if(st.gps!=="on"||st.gpsMode!=="auto")return;
+  const age=state.lastFix?Date.now()-state.lastFix.t:1e15;
+  if(age>5*60*1000) doLocate(true);
+}
+
+// ---------------- interval utilities ----------------
+function ivMerge(list){
+  const s=list.filter(x=>x[1]-x[0]>1e-6).sort((a,b)=>a[0]-b[0]);
+  const out=[];
+  for(const iv of s){
+    if(out.length&&iv[0]<=out[out.length-1][1]+1e-6) out[out.length-1][1]=Math.max(out[out.length-1][1],iv[1]);
+    else out.push([iv[0],iv[1]]);
+  }
+  return out;
+}
+function ivSubtract(base,subs){
+  let cur=base.map(x=>[x[0],x[1]]);
+  for(const s of ivMerge(subs)){
+    const nxt=[];
+    for(const b of cur){
+      if(s[1]<=b[0]+1e-6||s[0]>=b[1]-1e-6){nxt.push(b);continue;}
+      if(s[0]>b[0]+1e-6) nxt.push([b[0],s[0]]);
+      if(s[1]<b[1]-1e-6) nxt.push([s[1],b[1]]);
+    }
+    cur=nxt;
+  }
+  return cur;
+}
+const ivLen=l=>l.reduce((s,x)=>s+(x[1]-x[0]),0);
+const segIv=g=>[Math.min(g.a,g.b),Math.max(g.a,g.b)];
+
+// ---------------- legs + quests ----------------
+function activeQuests(){
+  if(state.settings.questsOn!==true) return [];
+  const out=[];
+  for(const q of QUESTS){ if(state.questSel[q.id]) out.push({...q}); }
+  (state.customQuests||[]).forEach((c,i)=>{
+    const at=num(c.at),mi=num(c.mi),g=num(c.gain)||0;
+    if(at!==null&&mi!==null&&mi>0) out.push({id:"c"+i,name:c.name||"Side quest",at,mi,gain:Math.max(0,g)});
+  });
+  return out;
+}
+function buildLegs(){
+  const st=state.settings;
+  let from=st.start, sign=st.dir==="SOBO"?-1:1;
+  const legs=[]; const issues=[];
+  const rcs=st.legsOn?(state.routeChanges||[]):[];
+  rcs.forEach((rc,i)=>{
+    const at=num(rc.at), to=num(rc.to);
+    if(at===null||to===null){issues.push("Change "+(i+1)+": incomplete");return;}
+    if(at<0||at>2650.1||to<0||to>2650.1){issues.push("Change "+(i+1)+": mile outside the trail (0–2650.1)");return;}
+    if((at-from)*sign<=1e-9){issues.push("Change "+(i+1)+": mi "+at+" not ahead on current leg");return;}
+    legs.push({from,to:at,sign,travelAfter:rc.travel!==false});
+    from=to; sign=rc.dir==="SOBO"?-1:1;
+  });
+  if(Math.abs(st.end-from)>1e-9) legs.push({from,to:st.end,sign:(st.end-from)>=0?1:-1,travelAfter:false});
+  if(!legs.length) legs.push({from:st.start,to:st.end,sign:st.end>=st.start?1:-1,travelAfter:false});
+  return {legs,issues};
+}
+function newCursor(legs){return {li:0,pos:legs[0].from,cum:0,bonus:0,bonusName:"",qHit:{},travel:null,done:false,jump:null};}
+function advance(cur,miles,legs,quests){
+  const segs=[];
+  if(cur.travel){const t=cur.travel;cur.travel=null;return {segs,travel:t};}
+  let m=miles;
+  while(m>1e-9&&!cur.done){
+    if(cur.bonus>1e-9){
+      const w=Math.min(m,cur.bonus);
+      const p0=(cur.bonusTotal||0)-cur.bonus;
+      cur.bonus-=w; cur.cum+=w; m-=w;
+      segs.push({quest:cur.bonusName,mi:w,p0,p1:p0+w,qt:cur.bonusTotal||0,qg:cur.bonusGain||0});
+      continue;
+    }
+    const leg=legs[cur.li];
+    const remain=Math.abs(leg.to-cur.pos);
+    let w=Math.min(m,remain);
+    let qa=null;
+    for(const q of quests){
+      if(cur.qHit[q.id]) continue;
+      const d=(q.at-cur.pos)*leg.sign;
+      if(d>=-1e-9&&d<=w+1e-9){ if(qa===null||d<qa.d) qa={q,d}; }
+    }
+    if(qa){
+      const w1=Math.max(0,qa.d);
+      if(w1>1e-9){segs.push({a:cur.pos,b:cur.pos+leg.sign*w1,sign:leg.sign,mi:w1});cur.pos+=leg.sign*w1;cur.cum+=w1;m-=w1;}
+      cur.qHit[qa.q.id]=1; cur.bonus=qa.q.mi; cur.bonusName=qa.q.name; cur.bonusTotal=qa.q.mi; cur.bonusGain=qa.q.gain;
+      continue;
+    }
+    if(w>1e-9){segs.push({a:cur.pos,b:cur.pos+leg.sign*w,sign:leg.sign,mi:w});cur.pos+=leg.sign*w;cur.cum+=w;m-=w;}
+    if(Math.abs(leg.to-cur.pos)<=1e-9){
+      if(cur.li+1<legs.length){
+        const jump={from:leg.to,to:legs[cur.li+1].from};
+        cur.li++; cur.pos=legs[cur.li].from; cur.jump=jump;
+        if(leg.travelAfter) cur.travel=jump;
+        m=0;
+      } else cur.done=true;
+    }
+  }
+  return {segs,travel:null};
+}
+
+// ---------------- engine ----------------
+function compute(){
+  const st=state.settings;
+  const {legs,issues}=buildLegs();
+  const quests=activeQuests();
+  const totalTrail=legs.reduce((s,l)=>s+Math.abs(l.to-l.from),0);
+  const totalPlanned=totalTrail+quests.reduce((s,q)=>s+q.mi,0);
+  const pace=(()=>{const p=num(state.pace);return p!==null&&p>0?p:15;})();
+  let lastEntered=0;
+  for(const k in state.actuals){const d=parseInt(k,10);if(state.actuals[k]&&num(state.actuals[k].v)!==null&&d>lastEntered)lastEntered=d;}
+  const planC=newCursor(legs), projC=newCursor(legs);
+  const rows=[]; let day=0; let finishETA=null;
+  const stoneMap={};
+  const envMin=Math.min(...legs.map(l=>Math.min(l.from,l.to)));
+  const envMax=Math.max(...legs.map(l=>Math.max(l.from,l.to)));
+  for(const w of WPTS){
+    if((w[2].includes("R")||w[2].includes("M"))&&w[0]>=envMin-1e-9&&w[0]<=envMax+1e-9)
+      stoneMap[w[0]]={name:w[1],mile:w[0],planDate:null,eta:null,etaCum:null};
+  }
+  const markStones=(segs,date,key,cumBase)=>{
+    let c=cumBase;
+    for(const g of segs){
+      if(g.quest){c+=g.mi;continue;}
+      const lo=Math.min(g.a,g.b),hi=Math.max(g.a,g.b);
+      for(const mKey in stoneMap){
+        const sn=stoneMap[mKey];
+        if(sn[key]===null&&sn.mile>=lo-1e-9&&sn.mile<=hi+1e-9){
+          sn[key]=date;
+          if(key==="eta") sn.etaCum=c+Math.abs(sn.mile-g.a);
+        }
+      }
+      c+=g.mi;
+    }
+  };
+  while(day<400&&(!planC.done||!projC.done||day<lastEntered)){
+    day++;
+    const date=dateForDay(day);
+    const def=planC.travel?0:Math.round(Math.min(pace,Math.max(0,totalPlanned-planC.cum))*10)/10;
+    const pOv=num(state.planned[day]); const pm=(pOv!==null&&pOv>=0)?pOv:def;
+    const planDoneStart=planC.done, projDoneStart=projC.done;
+    const planPos0=planC.pos, projPos0=projC.pos;
+    const planCumBase=planC.cum, projCumBase=projC.cum;
+    const pAdv=advance(planC,pm,legs,quests);
+    // projected
+    const ent=state.actuals[day];
+    const raw=ent?num(ent.v):null;
+    const mode=ent&&ent.m?ent.m:(st.logMode||"mi");
+    let am=null;
+    if(raw!==null){
+      if(mode==="pct"){
+        if(projC.travel) projC.travel=null;
+        if(projC.bonus>1e-9) projC.bonus=0;
+        const leg=legs[Math.min(projC.li,legs.length-1)];
+        am=(raw-projC.pos)*leg.sign;
+      } else am=raw;
+    }
+    const has=am!==null&&isFinite(am);
+    let jAdv;
+    if(has){ if(projC.travel) projC.travel=null; jAdv=advance(projC,Math.max(am,0),legs,quests); }
+    else jAdv=advance(projC,(pOv!==null&&pOv>=0)?pOv:Math.round(Math.min(pace,Math.max(0,totalPlanned-projC.cum))*10)/10,legs,quests);
+    markStones(pAdv.segs,date,"planDate",planCumBase);
+    markStones(jAdv.segs,date,"eta",projCumBase);
+    if(finishETA===null&&projC.done&&!projDoneStart) finishETA=date;
+    rows.push({d:day,date,def,rawPm:pm,
+      actualMi:has?am:null,entryMode:mode,rawV:ent?ent.v:"",
+      plan:{segs:pAdv.segs,travel:pAdv.travel,pos:planC.pos,pos0:planPos0,cum:planC.cum,doneStart:planDoneStart,li:planC.li},
+      proj:{segs:jAdv.segs,travel:jAdv.travel,pos:projC.pos,pos0:projPos0,cum:projC.cum,doneStart:projDoneStart,li:projC.li},
+      variance:projC.cum-planC.cum});
+  }
+  // current status
+  const cur=lastEntered===0?{pos:legs[0].from,cum:0,variance:0,li:0}
+    :{pos:rows[lastEntered-1].proj.pos,cum:rows[lastEntered-1].proj.cum,variance:rows[lastEntered-1].variance,li:rows[lastEntered-1].proj.li};
+  // coverage ledger from entered days
+  const walked=[];
+  for(let i=0;i<lastEntered&&i<rows.length;i++) for(const g of rows[i].proj.segs) if(!g.quest) walked.push(segIv(g));
+  const ledger=ivMerge(walked);
+  // future planned coverage
+  const future=[];
+  for(let i=lastEntered;i<rows.length;i++) for(const g of rows[i].proj.segs) if(!g.quest) future.push(segIv(g));
+  const red=ivSubtract(ivSubtract([[envMin,envMax]],ledger),future);
+  const uniqueDone=ivLen(ledger);
+  const stones=Object.values(stoneMap).sort((a,b)=>(a.etaCum===null?1e18:a.etaCum)-(b.etaCum===null?1e18:b.etaCum));
+  for(const sn of stones){
+    sn.reached=ledger.some(iv=>sn.mile>=iv[0]-1e-6&&sn.mile<=iv[1]+1e-6);
+    sn.away=sn.etaCum===null?null:Math.max(0,sn.etaCum-cur.cum);
+  }
+  const next=stones.find(s=>!s.reached&&s.away!==null&&s.away>1e-6);
+  return {st,legs,issues,quests,totalTrail,totalPlanned,rows,cur,lastEntered,
+    ledger,red,envMin,envMax,uniqueDone,totalWalked:cur.cum,stones,next,finishETA,pace};
+}
+
+// ---------------- per-day derivations for a view ----------------
+const WARN_RE=/dry|tank up|hot|exposed|snow|ford|washout|poison oak|routefinding|blowdown|no reliable|mosquito/i;
+function crossSeg(segs){
+  const cent=[]; let half=false, term=false, high=false;
+  for(const g of segs){
+    if(g.quest) continue;
+    const lo=Math.min(g.a,g.b),hi=Math.max(g.a,g.b);
+    for(let k=Math.ceil((lo+1e-9)/100)*100;k<=hi+1e-9;k+=100){ if(k>=100&&k<=2600) cent.push(k); }
+    if(lo<1325&&1325<=hi+1e-9) half=true;
+    if(lo<=779.5+1e-9&&779.5<=hi+1e-9) high=true;
+    if(hi>=2650.1-1e-6||lo<=1e-6) term=true;
+  }
+  return {cent:[...new Set(cent)],half,term,high};
+}
+function viewDay(r,view,m){
+  const v=r[view];
+  const out={travel:v.travel,segs:v.segs,pos:v.pos,pos0:v.pos0!==undefined?v.pos0:v.pos,doneStart:v.doneStart};
+  if(v.travel){
+    out.loc="Travel day — jump to "+wname(v.travel.to);
+    out.rel=""; out.note=""; out.gl={up:0,down:0}; out.passes=[]; out.bigPasses=[]; out.x={cent:[],half:false,term:false,high:false};
+    out.miles=0; out.questName="";
+    return out;
+  }
+  let up=0,down=0,miles=0,questMi=0,questName="";
+  const passes=[],bigPasses=[];
+  for(const g of v.segs){
+    miles+=g.mi;
+    if(g.quest){
+      questMi+=g.mi; questName=g.quest;
+      const half=(g.qt||0)/2;
+      if(half>0){
+        up+=(g.qg||0)*Math.max(0,Math.min(g.p1,half)-Math.min(g.p0,half))/half;
+        down+=(g.qg||0)*Math.max(0,g.p1-Math.max(g.p0,half))/half;
+      }
+      continue;
+    }
+    const gl=gainLoss(g.a,g.b); up+=gl.up; down+=gl.down;
+    const lo=Math.min(g.a,g.b),hi=Math.max(g.a,g.b);
+    for(const w of WPTS){
+      if(w[2].includes("R")&&w[0]>lo+1e-9&&w[0]<=hi+1e-9) passes.push(w[1]);
+      if(w[2].includes("P")&&w[0]>lo+1e-9&&w[0]<=hi+1e-9) bigPasses.push(w[1]+" ("+Math.round(eleAtMile(w[0])).toLocaleString()+" ft)");
+    }
+  }
+  out.gl={up:Math.round(up),down:Math.round(down)}; out.passes=passes; out.bigPasses=bigPasses; out.miles=miles;
+  out.x=crossSeg(v.segs); out.questName=questName;
+  const endPos=v.pos;
+  if(questMi>0&&questMi>=miles-1e-6){ out.loc=questName+" (side quest)"; out.rel=""; out.note=""; }
+  else{
+    const sg=segFor(endPos);
+    out.loc=sg[1]; out.note=sg[2];
+    // relative phrase using leg direction
+    const leg=m.legs[Math.min(v.li,m.legs.length-1)];
+    let prev=null,nextW=null;
+    const sorted=[...WPTS].sort((a,b)=>(a[0]-b[0])*leg.sign);
+    for(const w of sorted){ const dd=(w[0]-endPos)*leg.sign; if(dd<=1e-9)prev=w; else {nextW=w;break;} }
+    if(nextW&&prev&&Math.abs(nextW[0]-endPos)<Math.abs(endPos-prev[0])) out.rel=fmtMi(Math.abs(nextW[0]-endPos))+" mi before "+nextW[1];
+    else if(prev) out.rel=Math.abs(endPos-prev[0])<0.05?prev[1]:prev[1]+" + "+fmtMi(Math.abs(endPos-prev[0]))+" mi";
+    else out.rel="";
+  }
+  return out;
+}
+function mkBadges(x,q){
+  let h="";
+  for(const k of x.cent) h+='<span class="mk">MILE '+k.toLocaleString()+'</span>';
+  if(x.half) h+='<span class="mk gold">⭐ PCT HALFWAY</span>';
+  if(x.high) h+='<span class="mk gold">▲ PCT HIGH POINT</span>';
+  if(x.term) h+='<span class="mk gold">🏁 TERMINUS</span>';
+  if(q) h+='<span class="mk quest">⚔ SIDE QUEST</span>';
+  return h;
+}
+function cardTint(x,hasResupply,warnNote,travel,quest){
+  if(state.settings.colors===false) return "";
+  if(travel) return " bg-travel";
+  if(x.term||x.half||x.high) return " bg-gold";
+  if(quest) return " bg-quest";
+  if(warnNote&&WARN_RE.test(warnNote)) return " bg-warn";
+  if(x.cent.length) return " bg-cent";
+  if(hasResupply) return " bg-res";
+  return "";
+}
+
+// ---------------- renders ----------------
+function renderHeader(m){
+  document.getElementById("tripLine").textContent="PCT "+(m.legs[0].sign>0?"NOBO":"SOBO")+(m.legs.length>1?" · "+m.legs.length+" LEGS":"")+" · "+wname(m.st.start).split("—")[0].split("/")[0].trim()+" → "+wname(m.st.end).split("—")[0].split("/")[0].trim();
+  document.getElementById("curMile").textContent=fmtMi(m.cur.pos);
+  const v=m.cur.variance, chip=document.getElementById("varChip");
+  chip.textContent=m.lastEntered===0?"no days logged yet":Math.abs(v)<0.05?"on plan":fmtMi(Math.abs(v))+" mi "+(v>0?"ahead":"behind");
+  chip.style.background=m.lastEntered===0?"#3d5245":v>=0?"var(--trail)":"var(--blaze)";
+  let doneTxt=fmtMi(m.uniqueDone)+" mi done";
+  if(m.totalWalked>m.uniqueDone+0.1) doneTxt=fmtMi(m.uniqueDone)+" unique · "+fmtMi(m.totalWalked)+" walked";
+  document.getElementById("stat1").textContent=doneTxt+" · "+fmtMi(Math.max(0,m.totalPlanned-m.totalWalked))+" to go of "+fmtMi(m.totalPlanned);
+  document.getElementById("stat2").textContent="Finish ETA: "+(m.finishETA?fmtDate(m.finishETA):"—");
+  document.getElementById("nextLine").textContent=m.next?("NEXT: "+m.next.name+" · "+fmtMi(m.next.away)+" mi · ETA "+(m.next.eta?fmtDate(m.next.eta):"—")):"Route complete!";
+  // ribbon: geographic axis with covered/red/future
+  const W=340,pad=6,dom=Math.max(1,m.envMax-m.envMin);
+  const x=mi=>pad+((Math.max(m.envMin,Math.min(mi,m.envMax))-m.envMin)/dom)*(W-2*pad);
+  const N=140,es=[];
+  for(let i=0;i<=N;i++) es.push(eleAtMile(m.envMin+dom*i/N));
+  const t0=nom2trk(m.envMin),t1=nom2trk(m.envMax);
+  let hiTrue=-1e9;for(let i=Math.max(0,Math.floor(t0/ELE.step));i<=Math.min(ELE.e.length-1,Math.ceil(t1/ELE.step));i++) if(ELE.e[i]>hiTrue)hiTrue=ELE.e[i];
+  const lo=Math.min(...es),hi=Math.max(...es),span=Math.max(200,hi-lo);
+  const y=e=>46-((e-lo)/span)*34;
+  const pathFor=(m0,m1)=>{let p="";for(let i=0;i<=N;i++){const mm=m.envMin+dom*i/N;if(mm<m0-dom/N||mm>m1+dom/N)continue;p+=(p?" L":"M")+x(mm).toFixed(1)+" "+y(es[i]).toFixed(1);}return p;};
+  let svg='<path d="'+pathFor(m.envMin,m.envMax)+'" fill="none" stroke="#5c6f60" stroke-width="1.6"/>';
+  for(const iv of m.red) svg+='<path d="'+pathFor(iv[0],iv[1])+'" fill="none" stroke="#C24B27" stroke-width="2.4"/>';
+  for(const iv of m.ledger) svg+='<path d="'+pathFor(iv[0],iv[1])+'" fill="none" stroke="#E8A33D" stroke-width="2.4"/>';
+  for(const sn of m.stones) svg+='<line x1="'+x(sn.mile)+'" y1="52" x2="'+x(sn.mile)+'" y2="58" stroke="'+(sn.reached?"#E8A33D":"#7d8a7d")+'" stroke-width="1"/>';
+  svg+='<circle cx="'+x(m.cur.pos)+'" cy="'+y(eleAtMile(m.cur.pos))+'" r="4.5" fill="#E8A33D" stroke="#16241B" stroke-width="2"/>';
+  svg+='<text x="'+pad+'" y="9" fill="#9fb0a2" font-size="9">mi '+fmtMi(m.envMin)+'</text>';
+  svg+='<text x="'+(W-pad)+'" y="9" fill="#9fb0a2" font-size="9" text-anchor="end">mi '+fmtMi(m.envMax)+' · peak '+Math.round(hiTrue).toLocaleString()+' ft</text>';
+  svg+='<text x="'+Math.min(Math.max(x(m.cur.pos),28),W-34)+'" y="64" fill="#E8A33D" font-size="10" text-anchor="middle">'+(Math.round(m.cur.pos*10)/10)+'</text>';
+  document.getElementById("ribbon").innerHTML=svg;
+}
+const tDayOf=()=>todayDayNum();
+function travelCard(r,vd,tDay){
+  return '<div class="card bg-travel'+(r.d===tDay?' today':'')+'" style="text-align:center">'
+    +'<div class="daynum" style="color:#4a6584">DAY '+r.d+' · TRAVEL DAY</div>'
+    +'<div class="sub">'+fmtDate(r.date)+' — jump '+esc(wname(vd.travel.from))+' → '+esc(wname(vd.travel.to))+'</div></div>';
+}
+function renderLog(m){
+  const tDay=tDayOf();
+  let html="",doneShown=false;
+  for(const r of m.rows){
+    const vd=viewDay(r,"proj",m);
+    if(vd.doneStart&&!vd.travel&&vd.miles<1e-9&&r.actualMi===null){
+      if(!doneShown){html+='<div class="card" style="text-align:center;border-color:var(--trail)"><div class="daynum" style="font-size:20px">ROUTE COMPLETE</div><div class="sub">Projected finish: day '+(r.d-1)+' · '+fmtDate(dateForDay(r.d-1))+'</div></div>';doneShown=true;}
+      continue;
+    }
+    if(vd.travel){html+=travelCard(r,vd,tDay);continue;}
+    const logged=r.actualMi!==null;
+    const varTxt=logged&&Math.abs(r.variance)>=0.05?' · <span class="'+(r.variance>0?"pos":"neg")+'">'+(r.variance>0?"+":"")+fmtMi(r.variance)+' vs plan</span>':"";
+    const glTxt=' · ↑'+vd.gl.up.toLocaleString()+' ↓'+vd.gl.down.toLocaleString()+' ft';
+    const bits=[];
+    if(r.d===1) bits.push('<b>🥾 Depart '+esc(wname(m.st.start))+' (mi '+fmtMi(m.st.start)+')</b>');
+    if(vd.rel) bits.push(esc("📍 "+vd.rel));
+    if(vd.questName){const q=activeQuests().find(x=>x.name===vd.questName); if(q&&q.alt) bits.push('<b>⛰ '+esc(q.name)+' — summit '+q.alt.toLocaleString()+' ft</b>');}
+    if(vd.bigPasses.length) bits.push('<b>⛰ '+esc(vd.bigPasses.join(" · "))+'</b>');
+    if(vd.note) bits.push(esc(vd.note));
+    if(vd.passes.length) bits.push('<b style="color:var(--trail)">🛒 Resupply: '+esc(vd.passes.join(" · "))+'</b>');
+    const note=bits.length?'<div class="note">'+bits.join(" — ")+'</div>':"";
+    html+='<div class="card'+(r.d===tDay?' today':'')+cardTint(vd.x,vd.passes.length>0,vd.note,false,!!vd.questName)+'"><div class="rowtop">'
+      +'<div class="daycol"><div class="daynum">DAY '+r.d+'</div><div class="daydate">'+fmtDate(r.date)+(r.d===tDay?' · TODAY':'')+'</div></div>'
+      +'<div class="mid"><div class="loc">'+esc(vd.loc)+mkBadges(vd.x,vd.questName)+'</div><div class="sub">'+(logged?'walked '+fmtMi(r.actualMi):'plan '+fmtMi(vd.miles))+' mi · PCT mi <span class="mono">'+fmtMi(vd.pos0)+' → '+fmtMi(vd.pos)+'</span>'+glTxt+varTxt+'</div></div>'
+      +'<div class="iw"><input inputmode="decimal" placeholder="'+(r.entryMode==="pct"?fmtMi(vd.pos):fmtMi(vd.miles||r.rawPm))+'" value="'+esc(r.rawV)+'" data-actual="'+r.d+'" data-mode="'+r.entryMode+'" class="'+(logged?'filled':'')+'"><button class="ilbl" data-modetoggle="'+r.d+'">'+(r.entryMode==="pct"?"pct mile ⇄":"actual mi ⇄")+'</button></div>'
+      +'</div>'+note+'</div>';
+  }
+  document.getElementById("logList").innerHTML=html;
+}
+function renderStones(m){
+  document.getElementById("stoneList").innerHTML=m.stones.map(s=>{
+    const shift=s.planDate&&s.eta?Math.round((s.eta-s.planDate)/86400000):0;
+    const shiftTxt=shift!==0&&s.eta?' <span class="'+(shift<0?"pos":"neg")+'">('+(shift>0?"+":"")+shift+" day"+(Math.abs(shift)===1?"":"s")+')</span>':"";
+    return '<div class="card'+(s.reached?' done':'')+'">'
+      +'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><div class="loc">'+(s.reached?"✓ ":"")+esc(s.name)+'</div><div class="mono" style="font-size:13px;color:var(--muted);white-space:nowrap">mi '+fmtMi(s.mile)+' · '+Math.round(eleAtMile(s.mile)).toLocaleString()+' ft</div></div>'
+      +'<div class="sub">'+(s.reached?"Reached":s.away!==null?fmtMi(s.away)+" mi away":"not on remaining route")+' · plan '+(s.planDate?fmtDate(s.planDate):"—")+' · ETA <b>'+(s.eta?fmtDate(s.eta):"—")+'</b>'+shiftTxt+'</div></div>';
+  }).join("");
+}
+function renderPlan(m){
+  let html="";
+  for(const r of m.rows){
+    const vd=viewDay(r,"plan",m);
+    if(vd.doneStart&&!vd.travel&&vd.miles<1e-9){
+      html+='<div class="card" style="text-align:center;border-color:var(--trail)"><div class="daynum" style="font-size:18px">PLAN COMPLETE</div><div class="sub">Day '+(r.d-1)+' · '+fmtDate(dateForDay(r.d-1))+' at this pace</div></div>';
+      break;
+    }
+    if(vd.travel){html+=travelCard(r,vd,-1);continue;}
+    const pps=[];
+    if(r.d===1) pps.push('<b>🥾 Depart '+esc(wname(m.st.start))+' (mi '+fmtMi(m.st.start)+')</b>');
+    if(vd.bigPasses.length) pps.push('<b>⛰ '+esc(vd.bigPasses.join(" · "))+'</b>');
+    if(vd.passes.length) pps.push('<b style="color:var(--trail)">🛒 '+esc(vd.passes.join(" · "))+'</b>');
+    const noteHtml=pps.length?'<div class="note" style="margin-top:5px;padding-top:5px">'+pps.join(" — ")+'</div>':"";
+    const a=vd.pos0;
+    html+='<div class="card'+cardTint(vd.x,vd.passes.length>0,vd.note,false,!!vd.questName)+'" style="display:flex;align-items:center;gap:10px">'
+      +'<div class="daycol" style="width:74px"><div class="daynum">DAY '+r.d+'</div><div class="daydate">'+fmtDate(r.date)+'</div></div>'
+      +'<div class="mid"><div class="sub ellip">'+esc(vd.loc)+mkBadges(vd.x,vd.questName)+'</div><div class="mono" style="font-size:12px;color:var(--muted)">PCT mi '+fmtMi(a)+' → '+fmtMi(vd.pos)+' · ↑'+vd.gl.up.toLocaleString()+' ↓'+vd.gl.down.toLocaleString()+' ft</div>'+noteHtml+'</div>'
+      +'<div class="iw"><input inputmode="decimal" placeholder="'+fmtMi(r.def)+'" value="'+(state.planned[r.d]??"")+'" data-plan="'+r.d+'"><div class="ilbl">predicted mi</div></div>'
+      +'</div>';
+  }
+  document.getElementById("planList").innerHTML=html;
+}
+function renderSetup(m){
+  const st=state.settings;
+  const T=(id,on)=>{const e=document.getElementById(id);if(e)e.classList.toggle("on",on);};
+  T("dirNOBO",st.dir==="NOBO");T("dirSOBO",st.dir==="SOBO");
+  T("gpsOn",st.gps==="on");T("gpsOff",st.gps!=="on");
+  T("gpsMan",st.gpsMode!=="auto");T("gpsAuto",st.gpsMode==="auto");
+  T("logMi",st.logMode!=="pct");T("logPct",st.logMode==="pct");
+  T("colOn",st.colors!==false);T("colOff",st.colors===false);
+  T("legsOn2",st.legsOn===true);T("legsOff2",st.legsOn!==true);
+  T("qOn",st.questsOn===true);T("qOff",st.questsOn!==true);
+  const opts=(sel,chosen)=>{
+    const ths=st.dir==="NOBO"?TRAILHEADS:[...TRAILHEADS].reverse();
+    sel.innerHTML=ths.map(w=>'<option value="'+w[0]+'"'+(Math.abs(w[0]-chosen)<0.05?' selected':'')+'>'+esc(w[1])+' — mi '+w[0]+'</option>').join("");
+  };
+  opts(document.getElementById("startSel"),st.start);
+  opts(document.getElementById("endSel"),st.end);
+  const di=document.getElementById("dateInput"); if(di&&document.activeElement!==di) di.value=st.date||"";
+  document.getElementById("setupSummary").textContent=fmtMi(m.totalPlanned)+" planned miles ("+m.legs.length+" leg"+(m.legs.length===1?"":"s")+(m.quests.length?", "+m.quests.length+" side quest"+(m.quests.length===1?"":"s"):"")+") · at "+m.pace+" mi/day ≈ "+Math.ceil(m.totalPlanned/m.pace)+" days"+(m.issues.length?" · ⚠ "+m.issues.join("; "):"");
+  // route changes editor
+  const rcHost=document.getElementById("rcEditor");
+  if(rcHost){
+    rcHost.style.display=st.legsOn?"block":"none";
+    if(st.legsOn){
+      const thOpts=v=>TRAILHEADS.map(w=>'<option value="'+w[0]+'"'+(Math.abs(w[0]-v)<0.05?' selected':'')+'>'+esc(w[1])+' — mi '+w[0]+'</option>').join("");
+      document.getElementById("rcList").innerHTML=(state.routeChanges||[]).map((rc,i)=>
+        '<div class="card" style="padding:8px 10px">'
+        +'<div class="sub" style="margin:0 0 6px"><b>Change '+(i+1)+'</b> <button class="ilbl" data-rcdel="'+i+'" style="width:auto;float:right;color:var(--blaze)">remove ✕</button></div>'
+        +'<div class="setrow" style="margin-bottom:6px"><label style="width:70px">Leave at</label><select data-rc="'+i+'" data-f="at">'+(num(rc.at)===null?'<option value="" selected>— choose trailhead —</option>':'')+thOpts(num(rc.at)??-1)+'</select></div>'
+        +'<div class="setrow" style="margin-bottom:6px"><label style="width:70px">Jump to</label><select data-rc="'+i+'" data-f="to">'+thOpts(num(rc.to)??-1)+'</select></div>'
+        +'<div class="setrow" style="margin-bottom:6px"><label style="width:70px">Then go</label><select data-rc="'+i+'" data-f="dir"><option'+(rc.dir!=="SOBO"?" selected":"")+'>NOBO</option><option'+(rc.dir==="SOBO"?" selected":"")+'>SOBO</option></select></div>'
+        +'<div class="setrow" style="margin-bottom:0"><label style="width:70px">Travel day</label><input type="checkbox" data-rc="'+i+'" data-f="travel" '+(rc.travel!==false?"checked":"")+' style="flex:0;width:22px;height:22px"></div>'
+        +'</div>').join("");
+    }
+  }
+  // quests editor
+  const qHost=document.getElementById("qEditor");
+  if(qHost){
+    qHost.style.display=st.questsOn?"block":"none";
+    if(st.questsOn){
+      document.getElementById("qBuiltins").innerHTML=QUESTS.map(q=>
+        '<div class="setrow" style="margin-bottom:6px"><input type="checkbox" data-q="'+q.id+'" '+(state.questSel[q.id]?"checked":"")+' style="flex:0;width:22px;height:22px"><div class="sub" style="margin:0">'+esc(q.name)+' — mi '+q.at+', +'+q.mi+' mi, ↑'+q.gain.toLocaleString()+' ft</div></div>').join("");
+      document.getElementById("qCustom").innerHTML=(state.customQuests||[]).map((c,i)=>
+        '<div class="card" style="padding:8px 10px">'
+        +'<div class="sub" style="margin:0 0 6px"><b>Custom quest '+(i+1)+'</b> <button class="ilbl" data-cqdel="'+i+'" style="width:auto;float:right;color:var(--blaze)">remove ✕</button></div>'
+        +'<div class="setrow" style="margin-bottom:6px"><label style="width:70px">Name</label><input value="'+esc(c.name??"")+'" data-cq="'+i+'" data-f="name"></div>'
+        +'<div class="setrow" style="margin-bottom:6px"><label style="width:70px">At mi</label><input inputmode="decimal" value="'+esc(c.at??"")+'" data-cq="'+i+'" data-f="at" style="max-width:110px"></div>'
+        +'<div class="setrow" style="margin-bottom:6px"><label style="width:70px">Extra mi</label><input inputmode="decimal" value="'+esc(c.mi??"")+'" data-cq="'+i+'" data-f="mi" style="max-width:110px"></div>'
+        +'<div class="setrow" style="margin-bottom:0"><label style="width:70px">Gain ft</label><input inputmode="decimal" value="'+esc(c.gain??"")+'" data-cq="'+i+'" data-f="gain" style="max-width:110px"></div>'
+        +'</div>').join("");
+    }
+  }
+  // version + share
+  const vEl=document.getElementById("verLine"); if(vEl) vEl.textContent="Natcho v"+APP_VERSION+" · © 2026 Neurobomber · Free for personal, noncommercial use (PolyForm NC 1.0.0 — see LICENSE in the repo). Commercial rights reserved.";
+  const uEl=document.getElementById("shareUrl"); if(uEl) uEl.textContent=canonical()||"(available when hosted)";
+  ensureQR();
+}
+function renderAll(focusInfo){
+  const m=compute();
+  const pi=document.getElementById("paceInput"); if(pi&&document.activeElement!==pi) pi.value=state.pace??"";
+  renderHeader(m); renderLog(m); renderStones(m); renderPlan(m); renderSetup(m);
+  const gb=document.getElementById("gpsBar");
+  if(gb){
+    const on=state.settings.gps==="on";
+    gb.hidden=!on; gb.style.display=on?"flex":"none";
+    if(on&&state.lastFix){
+      const f=state.lastFix, ago=Math.round((Date.now()-f.t)/60000);
+      gpsMsg("PCT mi "+fmtMi(f.mile)+" · "+fmtMi(f.off)+" mi off trail · "+(ago<1?"just now":ago+" min ago"));
+      const lb=document.getElementById("logFixBtn"); const td=tDayOf();
+      lb.style.display=(td>=1&&f.off<=3)?"block":"none";
+    }
+    if(on) document.getElementById("locateBtn").style.display=state.settings.gpsMode==="auto"?"none":"block";
+    const ec=document.getElementById("emgCard");
+    if(ec){
+      const f=state.lastFix;
+      const big=document.getElementById("emgCoords"), tm=document.getElementById("emgTime");
+      if(state.settings.gps!=="on"){ big.textContent="GPS is off"; tm.textContent="Enable GPS above to record coordinates."; }
+      else if(!f||f.lat===undefined){ big.textContent="No fix yet"; tm.textContent="Tap GPS Locate to record your coordinates."; }
+      else { big.textContent=f.lat.toFixed(5)+"\n"+f.lon.toFixed(5);
+        tm.textContent="PCT mi "+fmtMi(f.mile)+" · "+new Date(f.t).toLocaleString("en-US",{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}); }
+    }
+  }
+  if(focusInfo){
+    const el=document.querySelector('[data-'+focusInfo.kind+'="'+focusInfo.d+'"]');
+    if(el){el.focus(); try{el.setSelectionRange(focusInfo.pos,focusInfo.pos);}catch(e){}}
+  }
+}
+
+// ---------------- version check + share + QR ----------------
+async function checkVersion(auto){
+  const el=document.getElementById("verStatus"); if(!el)return;
+  if(!auto) el.textContent="Checking…";
+  try{
+    const cu=canonical(); if(!cu){ if(!auto) el.textContent="Can\u2019t check from a local copy."; return; }
+    const r=await fetch(cu+"version.json?t="+Date.now(),{cache:"no-store"});
+    const j=await r.json();
+    if(j.version&&j.version!==APP_VERSION) el.textContent="⬆ Version "+j.version+" is available — reopen the app online (twice) to update, or visit "+cu;
+    else el.textContent=auto?"":"✓ You have the current version ("+APP_VERSION+").";
+  }catch(e){ if(!auto) el.textContent="Couldn’t check — you appear to be offline."; }
+}
+async function ensureQR(){
+  const img=document.getElementById("qrImg"); if(!img)return;
+  const cu=canonical(); if(!cu){ img.style.display="none"; return; }
+  if(state.qr&&state.qr.u===cu){ img.src=state.qr.d; img.style.display="block"; return; }
+  if(!navigator.onLine){ img.style.display="none"; return; }
+  try{
+    const r=await fetch("https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data="+encodeURIComponent(cu));
+    const b=await r.blob();
+    const fr=new FileReader();
+    fr.onload=()=>{ state.qr={u:cu,d:fr.result}; persist(); img.src=fr.result; img.style.display="block"; };
+    fr.readAsDataURL(b);
+  }catch(e){ img.style.display="none"; }
+}
+async function shareApp(){
+  try{
+    if(navigator.share){ await navigator.share({title:"Neurobomber’s Natcho — PCT Tracker",url:canonical()||location.href}); return; }
+  }catch(e){}
+  try{ await navigator.clipboard.writeText(canonical()||location.href); flashSave("link copied"); }catch(e){ flashSave("copy failed"); }
+}
+
+// ---------------- events ----------------
+document.body.addEventListener("click",e=>{
+  const mt=e.target.closest&&e.target.closest("[data-modetoggle]");
+  if(mt){
+    const d=parseInt(mt.dataset.modetoggle,10);
+    const m=compute(); const r=m.rows[d-1]; if(!r)return;
+    const cur=r.entryMode, next=cur==="pct"?"mi":"pct";
+    const ent=state.actuals[d];
+    if(ent&&num(ent.v)!==null&&r.actualMi!==null){
+      const newV=next==="pct"?fmtMi(r.proj.pos).replace(/,/g,""):fmtMi(r.actualMi).replace(/,/g,"");
+      state.actuals[d]={v:newV,m:next};
+    } else {
+      if(next===(state.settings.logMode||"mi")) delete state.actuals[d];
+      else state.actuals[d]={v:"",m:next};
+    }
+    persist(); renderAll(); return;
+  }
+  const rd=e.target.closest&&e.target.closest("[data-rcdel]");
+  if(rd){ state.routeChanges.splice(parseInt(rd.dataset.rcdel,10),1); persist(); renderAll(); return; }
+  const cd=e.target.closest&&e.target.closest("[data-cqdel]");
+  if(cd){ state.customQuests.splice(parseInt(cd.dataset.cqdel,10),1); persist(); renderAll(); return; }
+});
+document.body.addEventListener("change",e=>{
+  const t=e.target;
+  if(t.dataset&&t.dataset.rc!==undefined){
+    const i=parseInt(t.dataset.rc,10), f=t.dataset.f;
+    if(!state.routeChanges[i]) return;
+    state.routeChanges[i][f]=f==="travel"?t.checked:t.value;
+    persist(); renderAll(); return;
+  }
+  if(t.dataset&&t.dataset.cq!==undefined){
+    const i=parseInt(t.dataset.cq,10), f=t.dataset.f;
+    if(!state.customQuests[i]) return;
+    state.customQuests[i][f]=t.value;
+    persist(); renderAll(); return;
+  }
+  if(t.dataset&&t.dataset.q!==undefined){
+    state.questSel[t.dataset.q]=t.checked; persist(); renderAll(); return;
+  }
+});
+document.body.addEventListener("input",e=>{
+  const t=e.target; if(t.tagName!=="INPUT"||t.type==="date"||t.type==="checkbox")return;
+  if(t.dataset.rc!==undefined||t.dataset.cq!==undefined)return; // handled on change
+  const clean=t.value.replace(/[^0-9.]/g,""); if(clean!==t.value)t.value=clean;
+  const kind=t.dataset.actual?"actual":t.dataset.plan?"plan":t.dataset.pace?"pace":null; if(!kind)return;
+  const d=t.dataset.actual||t.dataset.plan||"";
+  if(kind==="actual") state.actuals[d]={v:clean,m:t.dataset.mode||state.settings.logMode||"mi"}; else if(kind==="plan") state.planned[d]=clean; else state.pace=clean;
+  if(clean===""){
+    if(kind==="actual"){ const mo=t.dataset.mode||"mi"; if(mo===(state.settings.logMode||"mi")) delete state.actuals[d]; else state.actuals[d]={v:"",m:mo}; }
+    else if(kind==="plan") delete state.planned[d];
+  }
+  persist();
+  renderAll({kind,d:kind==="pace"?"1":d,pos:t.selectionStart});
+});
+document.getElementById("dateInput").addEventListener("change",e=>{state.settings.date=e.target.value;persist();renderAll();});
+document.getElementById("startSel").addEventListener("change",e=>{state.settings.start=parseFloat(e.target.value);persist();renderAll();});
+document.getElementById("endSel").addEventListener("change",e=>{state.settings.end=parseFloat(e.target.value);persist();renderAll();});
+function setDir(dir){
+  const st=state.settings;
+  if(st.dir===dir)return;
+  st.dir=dir;
+  st.start=dir==="NOBO"?0:2650.1;
+  st.end=dir==="NOBO"?2650.1:0;
+  persist(); renderAll();
+}
+function thWindow(){
+  const st=state.settings, sign=st.dir==="SOBO"?-1:1;
+  return TRAILHEADS.filter(w=>(w[0]-st.start)*sign>1e-6&&(st.end-w[0])*sign>1e-6).sort((a,b)=>(a[0]-b[0])*sign);
+}
+function applyPreset(kind){
+  const st=state.settings;
+  if(state.routeChanges.length&&!confirm("Replace your existing route changes with this preset?"))return;
+  st.legsOn=true;
+  if(kind==="yoyo"){
+    state.routeChanges=[{at:st.end,to:st.end,dir:st.dir==="SOBO"?"NOBO":"SOBO",travel:false}];
+    st.end=st.start; // walk it back to where you began
+  } else {
+    const ths=thWindow();
+    if(ths.length>=2){
+      const mid=Math.floor(ths.length/2);
+      const q3=Math.max(mid+1,Math.min(ths.length-1,Math.floor(ths.length*0.75)));
+      const A=ths[mid][0], B=ths[q3][0];
+      if(kind==="jump") state.routeChanges=[{at:A,to:B,dir:st.dir,travel:true}];
+      else state.routeChanges=[{at:A,to:B,dir:st.dir==="SOBO"?"NOBO":"SOBO",travel:true},{at:A,to:B,dir:st.dir,travel:true}];
+    }
+  }
+  persist(); renderAll();
+  const e=document.getElementById("rcEditor"); if(e&&e.scrollIntoView)setTimeout(()=>e.scrollIntoView({behavior:"smooth",block:"start"}),60);
+}
+const on=(id,fn)=>{const e=document.getElementById(id);if(e)e.addEventListener("click",fn);};
+on("pJump",()=>applyPreset("jump"));
+on("pFlip",()=>applyPreset("flip"));
+on("pYoyo",()=>applyPreset("yoyo"));
+on("dirNOBO",()=>setDir("NOBO")); on("dirSOBO",()=>setDir("SOBO"));
+on("gpsOn",()=>{state.settings.gps="on";persist();renderAll();});
+on("gpsOff",()=>{state.settings.gps="off";persist();renderAll();});
+on("gpsMan",()=>{state.settings.gpsMode="manual";persist();renderAll();});
+on("gpsAuto",()=>{state.settings.gpsMode="auto";persist();renderAll();});
+on("locateBtn",()=>doLocate(false)); on("locateBtn2",()=>doLocate(false));
+on("logFixBtn",()=>{
+  const td=tDayOf(); if(td<1||!state.lastFix)return;
+  state.actuals[td]={v:String(state.lastFix.mile),m:"pct"};
+  persist(); renderAll();
+});
+on("logMi",()=>{state.settings.logMode="mi";persist();renderAll();});
+on("logPct",()=>{state.settings.logMode="pct";persist();renderAll();});
+on("colOn",()=>{state.settings.colors=true;persist();renderAll();});
+on("colOff",()=>{state.settings.colors=false;persist();renderAll();});
+on("legsOn2",()=>{state.settings.legsOn=true;persist();renderAll();const e=document.getElementById("rcEditor");if(e&&e.scrollIntoView)setTimeout(()=>e.scrollIntoView({behavior:"smooth",block:"start"}),60);});
+on("legsOff2",()=>{state.settings.legsOn=false;persist();renderAll();});
+on("qOn",()=>{state.settings.questsOn=true;persist();renderAll();const e=document.getElementById("qEditor");if(e&&e.scrollIntoView)setTimeout(()=>e.scrollIntoView({behavior:"smooth",block:"start"}),60);});
+on("qOff",()=>{state.settings.questsOn=false;persist();renderAll();});
+on("rcAdd",()=>{state.routeChanges.push({at:"",to:TRAILHEADS[0][0],dir:"NOBO",travel:true});persist();renderAll();});
+on("cqAdd",()=>{state.customQuests.push({name:"",at:"",mi:"",gain:""});persist();renderAll();});
+on("resetBtn",()=>{state.planned={};persist();renderAll();});
+on("wipeBtn",()=>{
+  if(confirm("Erase all logged days and per-day overrides? Your route settings stay.")){state.actuals={};state.planned={};persist();renderAll();}
+});
+on("verBtn",()=>checkVersion(false));
+on("shareBtn",shareApp);
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));
+  ["log","stones","plan","setup"].forEach(k=>document.getElementById("tab-"+k).hidden=(k!==b.dataset.tab));
+  if(b.dataset.tab==="log"||b.dataset.tab==="plan") maybeAutoLocate();
+  window.scrollTo(0,0);
+}));
+
+const jw=document.getElementById("jsWarn"); if(jw) jw.remove();
+if('serviceWorker' in navigator && location.protocol==='https:'){try{navigator.serviceWorker.register('./sw.js');}catch(e){}}
+renderAll();
+maybeAutoLocate();
+checkVersion(true);
+const td=tDayOf(); if(td>=1){const c=document.querySelector(".card.today");if(c)setTimeout(()=>c.scrollIntoView({block:"center"}),50);}
+
+</script>
+</body>
+</html>
