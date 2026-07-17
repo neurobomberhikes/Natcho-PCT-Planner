@@ -1,4 +1,4 @@
-# Neurobomber's Natcho — PCT Tracker
+# Neurobomber's Natcho PCT Planner
 
 Copyright 2026 Neurobomber. Licensed under the **PolyForm Noncommercial License 1.0.0** — see [LICENSE.md](LICENSE.md).
 
