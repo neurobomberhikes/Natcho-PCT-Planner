@@ -204,6 +204,11 @@ svg text{font-family:var(--mono)}
       <div id="snapList"></div>
       <div class="note">Share/copy puts your data somewhere off this phone (Notes, a message to yourself). Snapshots protect against accidental erases but live on this phone — they can't survive deleting the app icon.</div>
     </div>
+    <div class="card" style="border-color:var(--amber);background:#FBF3DC">
+      <div class="daynum" style="color:#8a651f">☕ ENJOYING THE NATCHO?</div>
+      <div class="sub" style="margin-top:4px">The Natcho is free for personal use, built by one hiker. Coffees fund trail-data updates and new trails — JMT next.</div>
+      <a href="https://buymeacoffee.com/Neurobomberhikes" target="_blank" rel="noopener" class="reset" style="display:block;text-align:center;text-decoration:none;margin:10px 0 2px;background:var(--amber);border-color:#C99A2E;color:#3d2f0a">☕ Buy me a coffee</a>
+    </div>
     <div class="card">
       <div class="daynum">VERSION &amp; SHARING</div>
       <div class="sub" id="verLine" style="margin-top:4px"></div>
@@ -246,11 +251,12 @@ svg text{font-family:var(--mono)}
     <div class="ilbl" style="text-align:center;margin-top:8px">release to close</div>
   </div>
 </div>
-<footer>Mileages are planning estimates — verify routing and water in FarOut / Gaia / CalTopo. Entries save on this device automatically and the app works offline after its first online load. © 2026 Neurobomber. All rights reserved. · Personal, noncommercial use only.</footer>
+<footer>Mileages are planning estimates — verify routing and water in FarOut / Gaia / CalTopo. Entries save on this device automatically and the app works offline after its first online load. © 2026 Neurobomber. All rights reserved. · Personal, noncommercial use only. · <a href="https://buymeacoffee.com/Neurobomberhikes" target="_blank" rel="noopener" style="color:#8a651f">☕ Buy me a coffee</a></footer>
 
 <script>
 // ============ Neurobomber's Natcho v2 — © 2026 Neurobomber. All rights reserved. ============
-const APP_VERSION="2.2.1";
+const APP_VERSION="2.2.2";
+const COFFEE_URL="https://buymeacoffee.com/Neurobomberhikes";
 const CANONICAL_PIN=""; // optional: set your permanent URL here when rebranding to pin share/QR/version-check
 function canonical(){
   if(CANONICAL_PIN) return CANONICAL_PIN;
