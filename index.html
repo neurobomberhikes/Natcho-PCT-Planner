@@ -137,10 +137,10 @@ svg text{font-family:var(--mono)}
     <div id="planList"></div>
   </section>
   <section id="tab-setup" hidden>
-    <p class="hint">Note: entering Canada via the trail is not currently permitted — NOBO hikes end at the Northern Terminus, then backtrack (Hart's Pass is the usual ~30 mi exit). Choose where and when your hike starts and ends. Mile markers are planning approximations (FarOut/Halfmile revisions shift them a little) — verify in your nav app.</p>
+    <p class="hint">Note: entering Canada via the trail is not currently permitted — NOBO hikes end at the Northern Terminus, then backtrack (Hart\u2019s Pass is the usual ~30 mi exit). Choose where and when your hike starts and ends. Mile markers are planning approximations (FarOut/Halfmile revisions shift them a little) — verify in your nav app.</p>
     <div class="card">
       <div class="setrow"><label>Direction</label>
-        <div class="seg2"><button id="dirNOBO" data-dir="NOBO">NOBO ↑</button><button id="dirSOBO" data-dir="SOBO">SOBO ↓</button></div>
+        <div class="seg2"><button id="dirNOBO" data-dir="NOBO">NOBO</button><button id="dirSOBO" data-dir="SOBO">SOBO</button></div>
       </div>
       <div class="setrow"><label>Start</label><select id="startSel"></select></div>
       <div class="setrow"><label>End</label><select id="endSel"></select></div>
@@ -152,7 +152,7 @@ svg text{font-family:var(--mono)}
       <div class="setrow"><label>Side quests</label>
         <div class="seg2"><button id="qOn">On</button><button id="qOff">Off</button></div>
       </div>
-      <div class="sub" style="margin:-4px 0 8px 102px">Bonus-mile detours (Mt. Whitney, custom peaks/hot springs) — extra days and gain are injected where each quest anchors.</div>
+      <div class="sub" style="margin:-4px 0 8px 102px">Bonus-mile detours (side peaks, hot springs, resupply spurs) — extra days and gain are injected where each quest anchors.</div>
       <div class="setrow"><label>Log entry</label>
         <div class="seg2"><button id="logMi">Miles / day</button><button id="logPct">PCT mile</button></div>
       </div>
@@ -199,14 +199,17 @@ svg text{font-family:var(--mono)}
         <button class="reset" id="pFlip" style="margin:0;flex:1;padding:9px 4px">Flip-flop</button>
         <button class="reset" id="pYoyo" style="margin:0;flex:1;padding:9px 4px">Yo-yo</button>
       </div>
+      <div id="trailPresets" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"></div>
       <div id="rcList"></div>
       <button class="reset" id="rcAdd">Add route change</button>
     </div>
     <div id="qEditor" style="display:none">
       <div class="sub" style="margin:2px 4px 8px"><b>Side quests</b> — tick to add the miles, days and climb at each anchor.</div>
       <div id="qBuiltins" class="card"></div>
+      <div class="sub" style="margin:10px 4px 4px"><b>Add another detour</b> — pick a common one to auto-fill, or add a blank to type your own.</div>
+      <select id="cqPick" style="margin-bottom:8px"><option value="">— choose a known detour —</option></select>
       <div id="qCustom"></div>
-      <button class="reset" id="cqAdd">Add custom quest</button>
+      <button class="reset" id="cqAdd">Add blank custom quest</button>
     </div>
     <div class="card">
       <div class="daynum">BACKUP &amp; RESTORE</div>
@@ -224,7 +227,7 @@ svg text{font-family:var(--mono)}
     </div>
     <div class="card" style="border-color:var(--amber);background:#FBF3DC">
       <div class="daynum" style="color:#8a651f">☕ ENJOYING THE NATCHO?</div>
-      <div class="sub" style="margin-top:4px">The Natcho is free for personal use, built by one hiker. Coffees fund trail-data updates and new trails — JMT next.</div>
+      <div class="sub" style="margin-top:4px">The Natcho is free for personal use, built by one hiker. Coffees fund trail-data updates and new trails.</div>
       <a href="https://buymeacoffee.com/Neurobomberhikes" target="_blank" rel="noopener" class="reset" style="display:block;text-align:center;text-decoration:none;margin:10px 0 2px;background:var(--amber);border-color:#C99A2E;color:#3d2f0a">☕ Buy me a coffee</a>
     </div>
     <div class="card">
@@ -272,8 +275,9 @@ svg text{font-family:var(--mono)}
 <footer>Mileages are planning estimates — verify routing and water in FarOut / Gaia / CalTopo. Entries save on this device automatically and the app works offline after its first online load. © 2026 Neurobomber. All rights reserved. · Personal, noncommercial use only. · <a href="https://buymeacoffee.com/Neurobomberhikes" target="_blank" rel="noopener" style="color:#8a651f">☕ Buy me a coffee</a></footer>
 
 <script>
+
 // ============ Neurobomber's Natcho v2 — © 2026 Neurobomber. All rights reserved. ============
-const APP_VERSION="2.4.1";
+const APP_VERSION="5.0.1-pct.1";
 const COFFEE_URL="https://buymeacoffee.com/Neurobomberhikes";
 const CANONICAL_PIN=""; // optional: set your permanent URL here when rebranding to pin share/QR/version-check
 function canonical(){
@@ -282,6 +286,8 @@ function canonical(){
   return "";
 }
 // ============ TRAIL CONFIG (generic-engine schema) ============
+// This block is the ONLY trail-specific data the day-structure engine reads.
+// A future generic engine loads one of these per trail; everything else is shared code.
 const TRAIL={
   id:"pct",
   name:"Pacific Crest Trail",
@@ -298,7 +304,21 @@ const TRAIL={
   noCamp:[],
   keyPoints:[ [766.3,"Whitney spur jct (Crabtree) — side trip to Mt. Whitney"] ],
   startResupply:{ NOBO:"Campo", SOBO:"Mazama / Winthrop" }
+  ,length:2650.1, classicEnd:2650.1, dirIncreasing:"NOBO",
+  abbr:"PCT", shareName:"Neurobomber’s Natcho PCT Planner",
+  halfwayMile:1325, highMile:779.5, highName:"PCT HIGH POINT",
+  centuryStep:100, centuryMin:100, centuryMax:2600, terminusHiEnd:true,
+  seam:null
+  ,presets:[]
+  ,disclaimer:"Note: entering Canada via the trail is not currently permitted — NOBO hikes end at the Northern Terminus, then backtrack (Hart\u2019s Pass is the usual ~30 mi exit). Choose where and when your hike starts and ends. Mile markers are planning approximations (FarOut/Halfmile revisions shift them a little) — verify in your nav app."
 };
+// ===== engine constants resolved from TRAIL config =====
+const T_LEN=TRAIL.length, T_END=TRAIL.classicEnd, T_ABBR=TRAIL.abbr;
+const T_INC=TRAIL.dirIncreasing;           // which dir increases mileage
+const T_HALF=TRAIL.halfwayMile, T_HIGH=TRAIL.highMile, T_HIGHNM=TRAIL.highName;
+const T_CSTEP=TRAIL.centuryStep, T_CMIN=TRAIL.centuryMin, T_CMAX=TRAIL.centuryMax;
+const T_TERMHI=TRAIL.terminusHiEnd, T_SEAM=TRAIL.seam;
+const T_KEY=TRAIL.id+"_full_v1", T_SNAP=TRAIL.id+"_full_snaps";
 const WPTS=[
 [0,"Campo — Southern Terminus","TR"],[20,"Lake Morena","R"],[41.5,"Mt. Laguna","R"],
 [77.3,"Scissors Crossing (Julian)","TR"],[109.5,"Warner Springs","TR"],
@@ -464,9 +484,11 @@ function segFor(mile){let out=SEGS[0];for(const g of SEGS){if(g[0]<=mile+1e-9)ou
 const QUESTS=[
  {id:"whitney",name:"Mt. Whitney summit",at:766.3,mi:15.5,gain:4100,alt:14505},
  {id:"sanjac",name:"San Jacinto Peak",at:181,mi:3.5,gain:1800,alt:10834}];
+// Catalog for the custom-quest picker: common named detours users can auto-fill instead of typing.
+const QUEST_CATALOG=[];
 
 // ---------------- storage ----------------
-const KEY="pct_full_v1";
+const KEY=T_KEY;
 let memStore=null;
 function loadState(){
   try{const raw=localStorage.getItem(KEY); if(raw) return JSON.parse(raw);}catch(e){}
@@ -476,7 +498,7 @@ function defaultState(){
   const t=new Date();
   const iso=t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");
   return {actuals:{},planned:{},pace:"",routeChanges:[],questSel:{},customQuests:[],
-    settings:{dir:"NOBO",start:0,end:2650.1,date:iso,colors:true,logMode:"mi",gps:"off",gpsMode:"manual",legsOn:false,questsOn:false}};
+    settings:{dir:"NOBO",start:0,end:T_END,date:iso,colors:true,logMode:"mi",gps:"off",gpsMode:"manual",legsOn:false,questsOn:false}};
 }
 function saveState(s){
   memStore=s;
@@ -486,8 +508,8 @@ function saveState(s){
 let saveT=null, state=loadState();
 function normalize(st){
 if(!st.settings) st.settings=defaultState().settings;
-if(st.settings.end===2658.9) st.settings.end=2650.1;
-if(st.settings.start===2658.9) st.settings.start=2650.1;
+if(st.settings.end===2658.9) st.settings.end=T_LEN;
+if(st.settings.start===2658.9) st.settings.start=T_LEN;
 if(st.settings.colors===undefined) st.settings.colors=true;
 if(!st.settings.logMode) st.settings.logMode="mi";
 if(!st.settings.gps) st.settings.gps="off";
@@ -549,6 +571,7 @@ function eleAtTrk(d){ // representative (mid) elevation for dot/label placement 
 function eleAtMile(m){return eleAtTrk(nom2trk(m));}
 function elePeakAtMile(m){const i=eleCell(nom2trk(m)); return ELE.hi[i];} // true high in the cell — for pass/summit labels
 function eleLowAtMile(m){const i=eleCell(nom2trk(m)); return ELE.lo[i];}
+// fine 0.1mi elevation (for smooth drawing only; text uses min/max peaks)
 const EFA=(()=>{const a=[];let c=0;for(const dv of EF.d){c+=dv;a.push(c);}return a;})();
 function eleFineAtTrk(t){ t=Math.max(0,Math.min(t,(EFA.length-1)*EF.step)); const x=t/EF.step, i=Math.min(EFA.length-2,Math.floor(x)); return EFA[i]+(EFA[i+1]-EFA[i])*(x-i); }
 function eleFineAtMile(m){ return eleFineAtTrk(nom2trk(m)); }
@@ -627,7 +650,7 @@ function maybeAutoLocate(){
 }
 
 // ---------------- backup & snapshots ----------------
-const SNAPKEY="pct_full_snaps";
+const SNAPKEY=T_SNAP;
 function readSnaps(){try{const r=localStorage.getItem(SNAPKEY);return r?JSON.parse(r):[];}catch(e){return [];}}
 function writeSnaps(a){try{localStorage.setItem(SNAPKEY,JSON.stringify(a));}catch(e){}}
 function snapshotNow(label){
@@ -730,7 +753,7 @@ function buildLegs(){
   rcs.forEach((rc,i)=>{
     const at=num(rc.at), to=num(rc.to);
     if(at===null||to===null){issues.push("Change "+(i+1)+": incomplete");return;}
-    if(at<0||at>2650.1||to<0||to>2650.1){issues.push("Change "+(i+1)+": mile outside the trail (0–2650.1)");return;}
+    if(at<0||at>T_LEN||to<0||to>T_LEN){issues.push("Change "+(i+1)+": mile outside the trail (0–"+T_LEN+")");return;}
     if((at-from)*sign<=1e-9){issues.push("Change "+(i+1)+": mi "+at+" not ahead on current leg");return;}
     legs.push({from,to:at,sign,travelAfter:rc.travel!==false});
     from=to; sign=rc.dir==="SOBO"?-1:1;
@@ -793,8 +816,12 @@ function compute(){
   const planC=newCursor(legs), projC=newCursor(legs);
   const rows=[]; let day=0; let finishETA=null;
   const stoneMap={};
-  const envMin=Math.min(...legs.map(l=>Math.min(l.from,l.to)));
-  const envMax=Math.max(...legs.map(l=>Math.max(l.from,l.to)));
+  const MAIN_END=T_SEAM?T_SEAM.mainEnd:1e9, CW_ATTACH=T_SEAM?T_SEAM.attach:0;
+  const mapEnd=e=>(T_SEAM&&e>MAIN_END+1e-6)?CW_ATTACH:e;
+  const rawMin=Math.min(...legs.map(l=>Math.min(l.from,l.to)));
+  const rawMax=Math.max(...legs.map(l=>Math.max(l.from,l.to)));
+  const envMin=Math.min(...legs.map(l=>Math.min(mapEnd(l.from),mapEnd(l.to))));
+  const envMax=Math.max(...legs.map(l=>Math.max(mapEnd(l.from),mapEnd(l.to))));
   for(const w of WPTS){
     if((w[2].includes("R")||w[2].includes("M"))&&w[0]>=envMin-1e-9&&w[0]<=envMax+1e-9)
       stoneMap[w[0]]={name:w[1],mile:w[0],planDate:null,eta:null,etaCum:null};
@@ -897,7 +924,7 @@ function compute(){
     if(TRAIL&&TRAIL.keyPoints) for(const k of TRAIL.keyPoints){ const lo=Math.min(r.proj.pos0,r.proj.pos),hi=Math.max(r.proj.pos0,r.proj.pos); if(k[0]>lo+1e-6&&k[0]<=hi+1e-6){ r.keyPt=k[1]; break; } }
   }
   return {st,legs,issues,quests,totalTrail,totalPlanned,rows,cur,lastEntered,
-    ledger,red,day0,exitDay,maxDaySpan,envMin,envMax,uniqueDone,totalWalked:cur.cum,stones,next,finishETA,pace};
+    ledger,red,day0,exitDay,maxDaySpan,envMin:rawMin,envMax:rawMax,uniqueDone,totalWalked:cur.cum,stones,next,finishETA,pace};
 }
 
 // ---------------- per-day derivations for a view ----------------
@@ -907,10 +934,10 @@ function crossSeg(segs){
   for(const g of segs){
     if(g.quest) continue;
     const lo=Math.min(g.a,g.b),hi=Math.max(g.a,g.b);
-    for(let k=Math.ceil((lo+1e-9)/100)*100;k<=hi+1e-9;k+=100){ if(k>=100&&k<=2600) cent.push(k); }
-    if(lo<1325&&1325<=hi+1e-9) half=true;
-    if(lo<=779.5+1e-9&&779.5<=hi+1e-9) high=true;
-    if(hi>=2650.1-1e-6||lo<=1e-6) term=true;
+    for(let k=Math.ceil((lo+1e-9)/T_CSTEP)*T_CSTEP;k<=hi+1e-9;k+=T_CSTEP){ if(k>=T_CMIN&&k<=T_CMAX) cent.push(k); }
+    if(lo<T_HALF&&T_HALF<=hi+1e-9) half=true;
+    if(lo<=T_HIGH+1e-9&&T_HIGH<=hi+1e-9) high=true;
+    if(lo<=1e-6||(T_TERMHI&&hi>=T_LEN-1e-6)) term=true;
   }
   return {cent:[...new Set(cent)],half,term,high};
 }
@@ -924,7 +951,7 @@ function viewDay(r,view,m){
     return out;
   }
   let up=0,down=0,miles=0,questMi=0,questName="";
-  const passes=[],bigPasses=[];
+  const passes=[],bigPasses=[],shelters=[];
   for(const g of v.segs){
     miles+=g.mi;
     if(g.quest){
@@ -941,9 +968,10 @@ function viewDay(r,view,m){
     for(const w of WPTS){
       if(w[2].includes("R")&&w[0]>lo+1e-9&&w[0]<=hi+1e-9) passes.push(w[1]);
       if(w[2].includes("P")&&w[0]>lo+1e-9&&w[0]<=hi+1e-9) bigPasses.push(w[1]+" ("+Math.round(elePeakAtMile(w[0])).toLocaleString()+" ft)");
+      if(w[2].includes("S")&&w[0]>lo+1e-9&&w[0]<=hi+1e-9) shelters.push({mi:w[0],name:w[1]});
     }
   }
-  out.gl={up:Math.round(up),down:Math.round(down)}; out.passes=passes; out.bigPasses=bigPasses; out.miles=miles;
+  out.gl={up:Math.round(up),down:Math.round(down)}; out.passes=passes; out.bigPasses=bigPasses; out.shelters=shelters; out.miles=miles;
   out.x=crossSeg(v.segs); out.questName=questName;
   const endPos=v.pos;
   if(questMi>0&&questMi>=miles-1e-6){ out.loc=questName+" (side quest)"; out.rel=""; out.note=""; }
@@ -964,8 +992,8 @@ function viewDay(r,view,m){
 function mkBadges(x,q){
   let h="";
   for(const k of x.cent) h+='<span class="mk">MILE '+k.toLocaleString()+'</span>';
-  if(x.half) h+='<span class="mk gold">⭐ PCT HALFWAY</span>';
-  if(x.high) h+='<span class="mk gold">▲ PCT HIGH POINT</span>';
+  if(x.half) h+='<span class="mk gold">⭐ '+T_ABBR+' HALFWAY</span>';
+  if(x.high) h+='<span class="mk gold">▲ '+T_HIGHNM+'</span>';
   if(x.term) h+='<span class="mk gold">🏁 TERMINUS</span>';
   if(q) h+='<span class="mk quest">⚔ SIDE QUEST</span>';
   return h;
@@ -983,7 +1011,7 @@ function cardTint(x,hasResupply,warnNote,travel,quest){
 
 // ---------------- renders ----------------
 function renderHeader(m){
-  document.getElementById("tripLine").textContent="PCT "+(m.legs[0].sign>0?"NOBO":"SOBO")+(m.legs.length>1?" · "+m.legs.length+" LEGS":"")+" · "+wname(m.st.start).split("—")[0].split("/")[0].trim()+" → "+wname(m.st.end).split("—")[0].split("/")[0].trim();
+  document.getElementById("tripLine").textContent=T_ABBR+" "+(m.legs[0].sign>0?(T_INC==="SOBO"?"SOBO":"NOBO"):(T_INC==="SOBO"?"NOBO":"SOBO"))+(m.legs.length>1?" · "+m.legs.length+" LEGS":"")+" · "+wname(m.st.start).split("—")[0].split("/")[0].trim()+" → "+wname(m.st.end).split("—")[0].split("/")[0].trim();
   document.getElementById("curMile").textContent=fmtMi(m.cur.pos);
   const v=m.cur.variance, chip=document.getElementById("varChip");
   chip.textContent=m.lastEntered===0?"no days logged yet":Math.abs(v)<0.05?"on plan":fmtMi(Math.abs(v))+" mi "+(v>0?"ahead":"behind");
@@ -1047,10 +1075,15 @@ function renderLog(m){
     if(r.keyPt) bits.push('<b>★ '+esc(r.keyPt)+'</b>');
     if(r.campWarn) bits.push('<b style="color:var(--blaze)">⛔ '+esc(r.campWarn)+'</b>');
     if(vd.passes.length) bits.push('<b style="color:var(--trail)">🛒 Resupply: '+esc(vd.passes.join(" · "))+'</b>');
+    if(vd.shelters&&vd.shelters.length){
+      const end=vd.shelters[vd.shelters.length-1];
+      const extra=vd.shelters.length>1?' (+'+(vd.shelters.length-1)+' more today)':'';
+      bits.push('<b style="color:var(--teal,#4aa9ad)">🏠 '+esc(end.name)+' — mi '+fmtMi(end.mi)+extra+'</b>');
+    }
     const note=bits.length?'<div class="note">'+bits.join(" — ")+'</div>':"";
     html+='<div class="card'+(r.d===tDay?' today':'')+cardTint(vd.x,vd.passes.length>0,vd.note,false,!!vd.questName)+'" data-day="'+r.d+'" data-dview="proj"><div class="rowtop">'
       +'<div class="daycol"><div class="daynum">DAY '+r.d+'</div><div class="daydate">'+fmtDate(r.date)+(r.d===tDay?' · TODAY':'')+'</div></div>'
-      +'<div class="mid"><div class="loc">'+esc(vd.loc)+mkBadges(vd.x,vd.questName)+'</div><div class="sub">'+(logged?'walked '+fmtMi(r.actualMi):'plan '+fmtMi(vd.miles))+' mi · PCT mi <span class="mono">'+fmtMi(vd.pos0)+' → '+fmtMi(vd.pos)+'</span>'+glTxt+varTxt+'</div></div>'
+      +'<div class="mid"><div class="loc">'+esc(vd.loc)+mkBadges(vd.x,vd.questName)+'</div><div class="sub">'+(logged?'walked '+fmtMi(r.actualMi):'plan '+fmtMi(vd.miles))+' mi · JMT mi <span class="mono">'+fmtMi(vd.pos0)+' → '+fmtMi(vd.pos)+'</span>'+glTxt+varTxt+'</div></div>'
       +'<div class="iw"><input inputmode="decimal" placeholder="'+(r.entryMode==="pct"?fmtMi(vd.pos):fmtMi(vd.miles||r.rawPm))+'" value="'+esc(r.rawV)+'" data-actual="'+r.d+'" data-mode="'+r.entryMode+'" class="'+(logged?'filled':'')+'"><button class="ilbl" data-modetoggle="'+r.d+'">'+(r.entryMode==="pct"?"pct mile ⇄":"actual mi ⇄")+'</button></div>'
       +'</div>'+note+'</div>';
   }
@@ -1089,7 +1122,7 @@ function renderPlan(m){
     const a=vd.pos0;
     html+='<div class="card'+cardTint(vd.x,vd.passes.length>0,vd.note,false,!!vd.questName)+'" data-day="'+r.d+'" data-dview="plan" style="display:flex;align-items:center;gap:10px">'
       +'<div class="daycol" style="width:74px"><div class="daynum">DAY '+r.d+'</div><div class="daydate">'+fmtDate(r.date)+'</div></div>'
-      +'<div class="mid"><div class="sub ellip">'+esc(vd.loc)+mkBadges(vd.x,vd.questName)+'</div><div class="mono" style="font-size:12px;color:var(--muted)">PCT mi '+fmtMi(a)+' → '+fmtMi(vd.pos)+' · ↑'+vd.gl.up.toLocaleString()+' ↓'+vd.gl.down.toLocaleString()+' ft</div>'+noteHtml+'</div>'
+      +'<div class="mid"><div class="sub ellip">'+esc(vd.loc)+mkBadges(vd.x,vd.questName)+'</div><div class="mono" style="font-size:12px;color:var(--muted)">JMT mi '+fmtMi(a)+' → '+fmtMi(vd.pos)+' · ↑'+vd.gl.up.toLocaleString()+' ↓'+vd.gl.down.toLocaleString()+' ft</div>'+noteHtml+'</div>'
       +'<div class="iw"><input inputmode="decimal" placeholder="'+fmtMi(r.def)+'" value="'+(state.planned[r.d]??"")+'" data-plan="'+r.d+'"><div class="ilbl">predicted mi</div></div>'
       +'</div>';
   }
@@ -1100,6 +1133,16 @@ function renderSetup(m){
   const st=state.settings;
   const T=(id,on)=>{const e=document.getElementById(id);if(e)e.classList.toggle("on",on);};
   T("dirNOBO",st.dir==="NOBO");T("dirSOBO",st.dir==="SOBO");
+  (function(){
+    // label direction buttons with the trail's own terminals (generic across trails)
+    const terms=WPTS.filter(w=>w[2].includes("TR"));
+    const first=terms.length?terms[0][1]:"", last=terms.length?terms[terms.length-1][1]:"";
+    const shortName=s=>s.replace(/\s*[—(].*$/,"").replace(/,.*$/,"").trim();
+    const a=shortName(first), b=shortName(last);
+    const nb=document.getElementById("dirNOBO"), sb=document.getElementById("dirSOBO");
+    if(nb&&a&&b) nb.textContent="NOBO · "+a+" → "+b;
+    if(sb&&a&&b) sb.textContent="SOBO · "+b+" → "+a;
+  })();
   T("gpsOn",st.gps==="on");T("gpsOff",st.gps!=="on");
   T("gpsMan",st.gpsMode!=="auto");T("gpsAuto",st.gpsMode==="auto");
   T("logMi",st.logMode!=="pct");T("logPct",st.logMode==="pct");
@@ -1140,6 +1183,8 @@ function renderSetup(m){
     if(st.questsOn){
       document.getElementById("qBuiltins").innerHTML=QUESTS.map(q=>
         '<div class="setrow" style="margin-bottom:6px"><input type="checkbox" data-q="'+q.id+'" '+(state.questSel[q.id]?"checked":"")+' style="flex:0;width:22px;height:22px"><div class="sub" style="margin:0">'+esc(q.name)+' — mi '+q.at+', +'+q.mi+' mi, ↑'+q.gain.toLocaleString()+' ft</div></div>').join("");
+      const cp=document.getElementById("cqPick");
+      if(cp) cp.innerHTML='<option value="">— choose a known detour —</option>'+QUEST_CATALOG.map((q,i)=>'<option value="'+i+'">'+esc(q.name)+' — mi '+q.at+', +'+q.mi+' mi'+(q.gain?', ↑'+q.gain.toLocaleString()+' ft':'')+'</option>').join("");
       document.getElementById("qCustom").innerHTML=(state.customQuests||[]).map((c,i)=>
         '<div class="card" style="padding:8px 10px">'
         +'<div class="sub" style="margin:0 0 6px"><b>Custom quest '+(i+1)+'</b> <button class="ilbl" data-cqdel="'+i+'" style="width:auto;float:right;color:var(--blaze)">remove ✕</button></div>'
@@ -1177,7 +1222,7 @@ function renderAll(focusInfo){
     gb.hidden=!on; gb.style.display=on?"flex":"none";
     if(on&&state.lastFix){
       const f=state.lastFix, ago=Math.round((Date.now()-f.t)/60000);
-      gpsMsg("PCT mi "+fmtMi(f.mile)+" · "+fmtMi(f.off)+" mi off trail · "+(ago<1?"just now":ago+" min ago"));
+      gpsMsg(T_ABBR+" mi "+fmtMi(f.mile)+" · "+fmtMi(f.off)+" mi off trail · "+(ago<1?"just now":ago+" min ago"));
       const lb=document.getElementById("logFixBtn"); const td=tDayOf();
       lb.style.display=(td>=1&&f.off<=3)?"block":"none";
     }
@@ -1189,7 +1234,7 @@ function renderAll(focusInfo){
       if(state.settings.gps!=="on"){ big.textContent="GPS is off"; tm.textContent="Enable GPS above to record coordinates."; }
       else if(!f||f.lat===undefined){ big.textContent="No fix yet"; tm.textContent="Tap GPS Locate to record your coordinates."; }
       else { big.textContent=f.lat.toFixed(5)+"\n"+f.lon.toFixed(5);
-        tm.textContent="PCT mi "+fmtMi(f.mile)+" · "+new Date(f.t).toLocaleString("en-US",{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}); }
+        tm.textContent=T_ABBR+" mi "+fmtMi(f.mile)+" · "+new Date(f.t).toLocaleString("en-US",{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}); }
     }
   }
   if(focusInfo){
@@ -1218,7 +1263,7 @@ function dayProfile(r,view){
       }
     } else {
       segX.push({a:g.a,b:g.b,x0:x,mi:g.mi});
-      const steps=Math.max(8,Math.round(g.mi/0.1));
+      const steps=Math.max(8,Math.round(g.mi/0.1)); // ~0.1mi sampling surfaces true cell peaks
       for(let i=0;i<=steps;i++){
         const f=i/steps, mile=g.a+(g.b-g.a)*f;
         pts.push({x:x+g.mi*f, e:eleFineAtMile(mile), hi:elePeakAtMile(mile), lo:eleLowAtMile(mile)});
@@ -1392,7 +1437,7 @@ async function ensureQR(){
 }
 async function shareApp(){
   try{
-    if(navigator.share){ await navigator.share({title:"Neurobomber’s Natcho PCT Planner",url:canonical()||location.href}); return; }
+    if(navigator.share){ await navigator.share({title:"Neurobomber’s Natcho JMT Planner",url:canonical()||location.href}); return; }
   }catch(e){}
   try{ await navigator.clipboard.writeText(canonical()||location.href); flashSave("link copied"); }catch(e){ flashSave("copy failed"); }
 }
@@ -1467,8 +1512,8 @@ function setDir(dir){
   const st=state.settings;
   if(st.dir===dir)return;
   st.dir=dir;
-  st.start=dir==="NOBO"?0:2650.1;
-  st.end=dir==="NOBO"?2650.1:0;
+  st.start=dir==="NOBO"?0:T_END;
+  st.end=dir==="NOBO"?T_END:0;
   persist(); renderAll();
 }
 function thWindow(){
@@ -1482,6 +1527,10 @@ function applyPreset(kind){
   if(kind==="yoyo"){
     state.routeChanges=[{at:st.end,to:st.end,dir:st.dir==="SOBO"?"NOBO":"SOBO",travel:false}];
     st.end=st.start; // walk it back to where you began
+  } else if((TRAIL.presets||[]).some(pr=>pr.id===kind)){
+    const pr=TRAIL.presets.find(p=>p.id===kind);
+    state.settings.dir=pr.dir; state.settings.start=pr.start; state.settings.end=pr.end;
+    state.routeChanges=pr.routeChanges.map(rc=>({...rc}));
   } else {
     const ths=thWindow();
     if(ths.length>=2){
@@ -1499,6 +1548,15 @@ const on=(id,fn)=>{const e=document.getElementById(id);if(e)e.addEventListener("
 on("pJump",()=>applyPreset("jump"));
 on("pFlip",()=>applyPreset("flip"));
 on("pYoyo",()=>applyPreset("yoyo"));
+// render trail-specific presets from config
+(function(){
+  const host=document.getElementById("trailPresets");
+  if(!host)return;
+  const prs=TRAIL.presets||[];
+  if(!prs.length){host.style.display="none";return;}
+  host.innerHTML=prs.map(pr=>'<button class="reset trailPreset" data-preset="'+pr.id+'" style="margin:0;flex:1;padding:9px 4px;min-width:44%">'+pr.label+'</button>').join("");
+  host.querySelectorAll(".trailPreset").forEach(b=>b.addEventListener("click",()=>applyPreset(b.dataset.preset)));
+})();
 on("dirNOBO",()=>setDir("NOBO")); on("dirSOBO",()=>setDir("SOBO"));
 on("gpsOn",()=>{state.settings.gps="on";persist();renderAll();});
 on("gpsOff",()=>{state.settings.gps="off";persist();renderAll();});
@@ -1527,6 +1585,14 @@ on("qOn",()=>{state.settings.questsOn=true;persist();renderAll();const e=documen
 on("qOff",()=>{state.settings.questsOn=false;persist();renderAll();});
 on("rcAdd",()=>{state.routeChanges.push({at:"",to:TRAILHEADS[0][0],dir:"NOBO",travel:true});persist();renderAll();});
 on("cqAdd",()=>{state.customQuests.push({name:"",at:"",mi:"",gain:""});persist();renderAll();});
+{const cp=document.getElementById("cqPick");
+ if(cp) cp.addEventListener("change",e=>{
+   const i=parseInt(e.target.value,10); if(isNaN(i))return;
+   const q=QUEST_CATALOG[i]; if(!q)return;
+   state.customQuests.push({name:q.name,at:String(q.at),mi:String(q.mi),gain:String(q.gain||"")});
+   persist(); renderAll();
+   const ed=document.getElementById("qEditor"); if(ed&&ed.scrollIntoView) setTimeout(()=>ed.scrollIntoView({behavior:"smooth",block:"end"}),60);
+ });}
 on("resetBtn",()=>{state.planned={};persist();renderAll();});
 on("wipeBtn",()=>{
   if(confirm("Erase all logged days and per-day overrides? Your route settings stay.")){state.actuals={};state.planned={};persist();renderAll();}
@@ -1551,6 +1617,7 @@ renderAll();
 maybeAutoLocate();
 checkVersion(true);
 const td=tDayOf(); if(td>=1){const c=document.querySelector(".card.today");if(c)setTimeout(()=>c.scrollIntoView({block:"center"}),50);}
+
 
 </script>
 </body>
